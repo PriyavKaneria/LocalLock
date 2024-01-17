@@ -1,11 +1,17 @@
 import { useNavigation } from "@react-navigation/native"
 import LottieView from "lottie-react-native"
 import { useState, useEffect, useRef } from "react"
-import { BackHandler, ToastAndroid, Animated } from "react-native"
+import {
+	StyleSheet,
+	BackHandler,
+	ToastAndroid,
+	Animated,
+	TouchableOpacity,
+	View,
+} from "react-native"
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import * as LocalAuthentication from "expo-local-authentication"
-import { log } from "react-native-reanimated"
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
@@ -52,7 +58,7 @@ export default () => {
 				)
 				Animated.timing(animationProgress.current, {
 					toValue: 0,
-					duration: 2000,
+					duration: 5000,
 					useNativeDriver: false,
 				}).start(() => navigation.navigate("List"))
 			} else if (results.error === "unknown") {
@@ -87,7 +93,7 @@ export default () => {
 		checkSupportedAuthentication()
 		Animated.timing(animationProgress.current, {
 			toValue: 1,
-			duration: 2000,
+			duration: 5000,
 			useNativeDriver: false,
 		}).start(() => authenticate())
 	}, [])
@@ -115,10 +121,25 @@ export default () => {
 	}
 
 	return (
-		<LottieView
-			source={require("../../assets/splash.json")}
-			progress={animationProgress.current}
-			loop={false}
-		/>
+		<View style={styles.main}>
+			<TouchableOpacity onPress={() => authenticate()} style={styles.opacity}>
+				<LottieView
+					source={require("../../assets/splash.json")}
+					progress={animationProgress.current}
+				/>
+			</TouchableOpacity>
+		</View>
 	)
 }
+
+const styles = StyleSheet.create({
+	main: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	opacity: {
+		width: 400,
+		height: 400,
+	},
+})
