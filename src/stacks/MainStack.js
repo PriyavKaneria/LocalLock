@@ -1,7 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import Splash from "../pages/Splash";
+import Splash from "../pages/SplashAuth";
 import ListScreen from "../pages/ListScreen";
 import AuthScreen from "../pages/AuthScreen";
 import EditNoteScreen from "../pages/EditNoteScreen";
