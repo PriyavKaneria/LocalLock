@@ -58,7 +58,7 @@ export default () => {
 				)
 				Animated.timing(animationProgress.current, {
 					toValue: 0,
-					duration: 5000,
+					duration: 3500,
 					useNativeDriver: false,
 				}).start(() => navigation.navigate("List"))
 			} else if (results.error === "unknown") {
@@ -93,7 +93,7 @@ export default () => {
 		checkSupportedAuthentication()
 		Animated.timing(animationProgress.current, {
 			toValue: 1,
-			duration: 5000,
+			duration: 3500,
 			useNativeDriver: false,
 		}).start(() => authenticate())
 	}, [])

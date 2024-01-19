@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
-import NotesReducer from "./NotesReducer";
+import PasswordsReducer from "./PasswordsReducer";
 
 export default combineReducers({
-  notes: NotesReducer,
+  passwords: PasswordsReducer,
 });

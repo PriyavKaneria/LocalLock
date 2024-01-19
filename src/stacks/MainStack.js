@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Splash from "../pages/SplashAuth";
 import ListScreen from "../pages/ListScreen";
-import EditNoteScreen from "../pages/EditNoteScreen";
+import SettingsScreen from "../pages/SettingsScreen";
 
 const MainStack = createStackNavigator();
 
@@ -16,14 +16,14 @@ export default () => (
       headerTintColor: "#222",
     }}
   >
-    <MainStack.Screen
+    {/* <MainStack.Screen
       name="Splash"
       component={Splash}
       options={{
         headerShown: false,
       }}
-    />
+    /> */}
     <MainStack.Screen name="List" component={ListScreen} />
-    <MainStack.Screen name="EditNote" component={EditNoteScreen} />
+    <MainStack.Screen name="Settings" component={SettingsScreen} />
   </MainStack.Navigator>
 );
