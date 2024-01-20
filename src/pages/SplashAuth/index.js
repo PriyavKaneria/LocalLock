@@ -12,6 +12,7 @@ import {
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import * as LocalAuthentication from "expo-local-authentication"
+import { useSelector } from "react-redux"
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
@@ -24,6 +25,7 @@ export default () => {
 	const [loading, setLoading] = useState(false)
 	const navigation = useNavigation()
 	const animationProgress = useRef(new Animated.Value(0))
+	const settings = useSelector((state) => state.settings.settings)
 
 	const checkSupportedAuthentication = async () => {
 		const types = await LocalAuthentication.supportedAuthenticationTypesAsync()
@@ -49,7 +51,10 @@ export default () => {
 		}
 		setLoading(true)
 		try {
-			const results = await LocalAuthentication.authenticateAsync()
+			const results = await LocalAuthentication.authenticateAsync({
+				disableDeviceFallback: settings.allowNonBiometric ? false : true,
+				cancelLabel: "Cancel",
+			})
 
 			if (results.success) {
 				ToastAndroid.show(
@@ -72,11 +77,7 @@ export default () => {
 				results.error === "system_cancel" ||
 				results.error === "app_cancel"
 			) {
-				ToastAndroid.show(
-					"Authentication required to open app",
-					ToastAndroid.SHORT
-				)
-				BackHandler.exitApp()
+				// Allow user to use PIN instead
 			}
 		} catch (error) {
 			ToastAndroid.show(
@@ -89,7 +90,9 @@ export default () => {
 	}
 
 	useEffect(() => {
-		BackHandler.addEventListener("hardwareBackPress", () => true)
+		BackHandler.addEventListener("hardwareBackPress", () =>
+			BackHandler.exitApp()
+		)
 		checkSupportedAuthentication()
 		Animated.timing(animationProgress.current, {
 			toValue: 1,

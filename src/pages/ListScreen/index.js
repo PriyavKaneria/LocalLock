@@ -8,6 +8,7 @@ import {
 	StyleSheet,
 	ToastAndroid,
 	Alert,
+	AppState,
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useDispatch, useSelector } from "react-redux"
@@ -33,8 +34,10 @@ import AddPasswordButton from "../../components/AddPasswordButton"
 export default () => {
 	const navigation = useNavigation()
 	const passwordsData = useSelector((state) => state.passwords.passwords)
+	const settings = useSelector((state) => state.settings.settings)
 	const dispatch = useDispatch()
 	const [modalVisible, setModalVisible] = useState(false)
+	const [appState, setAppState] = useState(AppState.currentState)
 
 	const [addPasswordMode, setAddPasswordMode] = useState(false)
 	const [editReferenceMode, setEditReferenceMode] = useState(false)
@@ -56,7 +59,9 @@ export default () => {
 	}
 
 	useEffect(() => {
-		BackHandler.addEventListener("hardwareBackPress", () => true)
+		BackHandler.addEventListener("hardwareBackPress", () =>
+			BackHandler.exitApp()
+		)
 	}, [])
 
 	useLayoutEffect(() => {
@@ -71,6 +76,18 @@ export default () => {
 				</AddButton>
 			),
 		})
+	}, [])
+
+	useEffect(() => {
+		AppState.addEventListener("change", () => {
+			setAppState(AppState.currentState)
+		})
+
+		return () => {
+			AppState.removeEventListener("change", () => {
+				setAppState(AppState.currentState)
+			})
+		}
 	}, [])
 
 	const handleViewPassword = (reference) => {
@@ -89,6 +106,13 @@ export default () => {
 	}
 
 	const handleDeleteButton = () => {
+		if (addPasswordMode) {
+			setAddPasswordMode(false)
+			setEditReferenceMode(false)
+			setEditPasswordMode(false)
+			setModalVisible(false)
+			return
+		}
 		Alert.alert(
 			"Delete password",
 			"Are you sure you want to delete this password?",
@@ -98,6 +122,7 @@ export default () => {
 					onPress: () => {
 						setEditReferenceMode(false)
 						setEditPasswordMode(false)
+						setAddPasswordMode(false)
 						setModalVisible(false)
 					},
 					style: "cancel",
@@ -113,6 +138,7 @@ export default () => {
 						})
 						setEditReferenceMode(false)
 						setEditPasswordMode(false)
+						setAddPasswordMode(false)
 						setModalVisible(false)
 					},
 				},
@@ -151,6 +177,7 @@ export default () => {
 		}
 		setEditReferenceMode(false)
 		setEditPasswordMode(false)
+		setAddPasswordMode(false)
 		setModalVisible(false)
 	}
 
@@ -163,10 +190,22 @@ export default () => {
 		return <AppLoading />
 	}
 
+	if (appState === "background") {
+		// The app is in the background
+		// Lock the app
+		navigation.navigate("Splash")
+	}
+
 	return (
 		<Container>
 			<Modal
 				isVisible={modalVisible}
+				onRequestClose={() => {
+					setEditReferenceMode(false)
+					setEditPasswordMode(false)
+					setAddPasswordMode(false)
+					setModalVisible(false)
+				}}
 				style={{ margin: 0, marginLeft: 20, marginRight: 20 }}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>
@@ -192,7 +231,9 @@ export default () => {
 					<Text style={modalStyles.floatLeft}>
 						{editPasswordMode
 							? "Edit password"
-							: "Password (hold to see and long press to copy)"}
+							: settings.longPressToCopy
+							? "Password (tap & hold to see, long press to copy)"
+							: "Password (tap and hold to see)"}
 					</Text>
 					<View style={modalStyles.inputContainer}>
 						<TouchableOpacity
@@ -233,7 +274,9 @@ export default () => {
 						<TouchableOpacity
 							style={modalStyles.deleteButton}
 							onPress={handleDeleteButton}>
-							<Text style={modalStyles.buttonText}>Delete</Text>
+							<Text style={modalStyles.buttonText}>
+								{editReferenceMode || editPasswordMode ? "Cancel" : "Delete"}
+							</Text>
 						</TouchableOpacity>
 						<TouchableOpacity
 							style={modalStyles.okButton}

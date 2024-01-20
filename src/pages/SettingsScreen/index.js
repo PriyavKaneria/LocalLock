@@ -1,168 +1,64 @@
-// import React, { useState, useEffect, useLayoutEffect } from "react"
-// import { useSelector, useDispatch } from "react-redux"
-// import { useRoute, useNavigation } from "@react-navigation/native"
-
-import {
-	Container,
-// 	TitleInput,
-// 	BodyInput,
-// 	SaveButton,
-// 	SaveButtonImage,
-// 	CloseButton,
-// 	CloseButtonImage,
-// 	ButtonsContainer,
-// 	DeleteButton,
-// 	DeleteButtonText,
-// 	SuccessButton,
-// 	SuccessButtonText,
-// 	NoSuccessButton,
-// 	NoSuccessButtonText,
-} from "./styles"
+import { ScrollView, Switch } from "react-native-gesture-handler"
+import { AddButton, AddButtonImage, Container, SettingsItem, SettingsItemText } from "./styles"
+import { useNavigation } from "@react-navigation/native"
+import { useDispatch, useSelector } from "react-redux"
+import { useLayoutEffect } from "react"
 
 export default () => {
-	// const navigation = useNavigation()
-	// const route = useRoute()
-	// const dispatch = useDispatch()
-	// const list = useSelector((state) => state.notes.list)
+	const navigation = useNavigation()
+	const dispatch = useDispatch()
+	const settings = useSelector((state) => state.settings.settings)
 
-	// const [title, setTitle] = useState("")
-	// const [body, setBody] = useState("")
-	// const [done, setDone] = useState(false)
-	// const [status, setStatus] = useState("new")
-
-	// useEffect(() => {
-	// 	if (route.params?.key !== undefined && list[route.params.key]) {
-	// 		setStatus("edit")
-	// 		setTitle(list[route.params.key].title)
-	// 		setBody(list[route.params.key].body)
-	// 		setDone(list[route.params.key].done)
-	// 	}
-	// }, [])
-
-	// useLayoutEffect(() => {
-	// 	navigation.setOptions({
-	// 		title: status === "new" ? "New Note" : "Edit Note",
-	// 		headerLeft: () => (
-	// 			<CloseButton underlayColor='transparent' onPress={handleCloseButton}>
-	// 				<CloseButtonImage source={require("../../assets/close.png")} />
-	// 			</CloseButton>
-	// 		),
-	// 		headerRight: () => (
-	// 			<SaveButton underlayColor='transparent' onPress={handleSaveButton}>
-	// 				<SaveButtonImage source={require("../../assets/save.png")} />
-	// 			</SaveButton>
-	// 		),
-	// 	})
-	// }, [status, title, body])
-
-	// const handleSaveButton = () => {
-	// 	if (title !== "" && body !== "") {
-	// 		if (status === "edit") {
-	// 			dispatch({
-	// 				type: "EDIT_NOTE",
-	// 				payload: {
-	// 					key: route.params.key,
-	// 					title,
-	// 					body,
-	// 					done,
-	// 				},
-	// 			})
-	// 		} else {
-	// 			dispatch({
-	// 				type: "ADD_NOTE",
-	// 				payload: { title, body },
-	// 			})
-	// 		}
-
-	// 		navigation.navigate("List")
-	// 	} else {
-	// 		alert("Preencha titulo e corpo")
-	// 	}
-	// }
-
-	// const handleCloseButton = () => navigation.navigate("List")
-
-	// const handleDeleteNote = () => {
-	// 	dispatch({
-	// 		type: "DELETE_NOTE",
-	// 		payload: {
-	// 			key: route.params.key,
-	// 		},
-	// 	})
-	// 	navigation.navigate("List")
-	// }
-
-	// const handleSuccessNote = () => {
-	// 	dispatch({
-	// 		type: "SUCCESS_NOTE",
-	// 		payload: {
-	// 			key: route.params.key,
-	// 			title,
-	// 			body,
-	// 		},
-	// 	})
-	// 	navigation.navigate("List")
-	// }
-
-	// const handleNoSuccessNote = () => {
-	// 	dispatch({
-	// 		type: "UNCHECK_NOTE",
-	// 		payload: {
-	// 			key: route.params.key,
-	// 			title,
-	// 			body,
-	// 		},
-	// 	})
-	// 	navigation.navigate("List")
-	// }
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			title: "Settings",
+			headerLeft: false,
+			headerRight: () => (
+				<AddButton
+					underlayColor='transparent'
+					onPress={() => navigation.navigate("List")}>
+					<AddButtonImage source={require("../../assets/exit.png")} />
+				</AddButton>
+			),
+		})
+	}, [])
 
 	return (
 		<Container>
-			{/* <TitleInput
-				value={title}
-				onChangeText={(t) => setTitle(t)}
-				placeholder='Title | ex: Run 🏃'
-				placeholderTextColor='#ccc'
-				autoFocus={true}
-				style={{ fontFamily: "WorkSans-SemiBold" }}
-			/>
-			<BodyInput
-				value={body}
-				onChangeText={(t) => setBody(t)}
-				placeholder='Details | ex: Go for a walk tomorrow for an hour or more 😎'
-				placeholderTextColor='#ccc'
-				multiline={true}
-				textAlignVertical='top'
-				style={{ fontFamily: "WorkSans-Regular" }}
-			/>
-			{status === "edit" && (
-				<ButtonsContainer>
-					<DeleteButton underlayColor='#FF0000' onPress={handleDeleteNote}>
-						<DeleteButtonText style={{ fontFamily: "WorkSans-Regular" }}>
-							Delete annotation
-						</DeleteButtonText>
-					</DeleteButton>
-
-					{!done && (
-						<SuccessButton underlayColor='#2E8500' onPress={handleSuccessNote}>
-							<SuccessButtonText style={{ fontFamily: "WorkSans-Regular" }}>
-								Mark as done
-							</SuccessButtonText>
-						</SuccessButton>
-					)}
-
-					{done && (
-						<NoSuccessButton
-							underlayColor='#2E8500'
-							onPress={handleNoSuccessNote}>
-							<NoSuccessButtonText style={{ fontFamily: "WorkSans-Regular" }}>
-								Uncheck
-							</NoSuccessButtonText>
-						</NoSuccessButton>
-					)}
-				</ButtonsContainer>
-			)} */}
-			Settings
+			<ScrollView>
+				<SettingsItem>
+					<SettingsItemText>
+						Allow non-biometric authentication
+					</SettingsItemText>
+					<Switch
+						trackColor={{ false: "#767577", true: "#81b0ff" }}
+						thumbColor={settings.allowNonBiometric ? "#f5dd4b" : "#f4f3f4"}
+						ios_backgroundColor='#3e3e3e'
+						onValueChange={() =>
+							dispatch({
+								type: "SET_ALLOW_NON_BIOMETRIC",
+								payload: !settings.allowNonBiometric,
+							})
+						}
+						value={settings.allowNonBiometric}
+					/>
+				</SettingsItem>
+				<SettingsItem>
+					<SettingsItemText>Long press to copy password</SettingsItemText>
+					<Switch
+						trackColor={{ false: "#767577", true: "#81b0ff" }}
+						thumbColor={settings.longPressToCopy ? "#f5dd4b" : "#f4f3f4"}
+						ios_backgroundColor='#3e3e3e'
+						onValueChange={() =>
+							dispatch({
+								type: "SET_LONG_PRESS_TO_COPY",
+								payload: !settings.longPressToCopy,
+							})
+						}
+						value={settings.longPressToCopy}
+					/>
+				</SettingsItem>
+			</ScrollView>
 		</Container>
 	)
 }
