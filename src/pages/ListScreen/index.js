@@ -30,6 +30,10 @@ import {
 
 import PasswordItem from "../../components/PasswordItem"
 import AddPasswordButton from "../../components/AddPasswordButton"
+import {
+	ScrollView,
+	TouchableWithoutFeedback,
+} from "react-native-gesture-handler"
 
 export default () => {
 	const navigation = useNavigation()
@@ -37,7 +41,6 @@ export default () => {
 	const settings = useSelector((state) => state.settings.settings)
 	const dispatch = useDispatch()
 	const [modalVisible, setModalVisible] = useState(false)
-	const [appState, setAppState] = useState(AppState.currentState)
 
 	const [addPasswordMode, setAddPasswordMode] = useState(false)
 	const [editReferenceMode, setEditReferenceMode] = useState(false)
@@ -79,13 +82,21 @@ export default () => {
 	}, [])
 
 	useEffect(() => {
+		const handleStateChange = (nextState) => {
+			if (nextState === "background") {
+				// The app is in the background
+				// Lock the app
+				const navigation = useNavigation()
+				navigation.navigate("Splash")
+			}
+		}
 		AppState.addEventListener("change", () => {
-			setAppState(AppState.currentState)
+			handleStateChange(AppState.currentState)
 		})
 
 		return () => {
 			AppState.removeEventListener("change", () => {
-				setAppState(AppState.currentState)
+				handleStateChange(AppState.currentState)
 			})
 		}
 	}, [])
@@ -190,15 +201,11 @@ export default () => {
 		return <AppLoading />
 	}
 
-	if (appState === "background") {
-		// The app is in the background
-		// Lock the app
-		navigation.navigate("Splash")
-	}
-
 	return (
 		<Container>
 			<Modal
+				animationIn={"zoomIn"}
+				animationOut={"zoomOut"}
 				isVisible={modalVisible}
 				onRequestClose={() => {
 					setEditReferenceMode(false)
@@ -206,7 +213,13 @@ export default () => {
 					setAddPasswordMode(false)
 					setModalVisible(false)
 				}}
-				style={{ margin: 0, marginLeft: 20, marginRight: 20 }}>
+				style={{ margin: 0, marginLeft: 20, marginRight: 20 }}
+				onBackdropPress={() => {
+					setEditReferenceMode(false)
+					setEditPasswordMode(false)
+					setAddPasswordMode(false)
+					setModalVisible(false)
+				}}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>
 						{editReferenceMode ? "Edit reference" : "Reference"}
@@ -240,7 +253,7 @@ export default () => {
 							onPressIn={() => setPasswordVisible(true)}
 							onPressOut={() => setPasswordVisible(false)}
 							onLongPress={() => {
-								if (!editPasswordMode) {
+								if (!editPasswordMode && settings.longPressToCopy) {
 									// copy password to clipboard
 									Clipboard.setStringAsync(password).then(() => {
 										ToastAndroid.show(

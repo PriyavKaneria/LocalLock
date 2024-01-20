@@ -32,7 +32,7 @@ export default () => {
 					</SettingsItemText>
 					<Switch
 						trackColor={{ false: "#767577", true: "#81b0ff" }}
-						thumbColor={settings.allowNonBiometric ? "#f5dd4b" : "#f4f3f4"}
+						thumbColor={settings.allowNonBiometric ? "#2a69d4" : "#f4f3f4"}
 						ios_backgroundColor='#3e3e3e'
 						onValueChange={() =>
 							dispatch({
@@ -47,7 +47,7 @@ export default () => {
 					<SettingsItemText>Long press to copy password</SettingsItemText>
 					<Switch
 						trackColor={{ false: "#767577", true: "#81b0ff" }}
-						thumbColor={settings.longPressToCopy ? "#f5dd4b" : "#f4f3f4"}
+						thumbColor={settings.longPressToCopy ? "#2a69d4" : "#f4f3f4"}
 						ios_backgroundColor='#3e3e3e'
 						onValueChange={() =>
 							dispatch({
