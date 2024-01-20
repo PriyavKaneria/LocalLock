@@ -6,7 +6,7 @@ import {
 
 export default AddPasswordButton = ({ onPress }) => {
 	return (
-		<Box onPress={() => onPress()}>
+		<Box underlayColor='#dee0e0' onPress={() => onPress()}>
 			<BoxContainer>
 				<Title
 					style={{

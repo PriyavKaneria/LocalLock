@@ -1,6 +1,6 @@
 const initialState = {
 	passwords: {
-		"RIL": "123456",
+		RIL: "123456",
 	},
 }
 
@@ -14,13 +14,13 @@ export default (state = initialState, action) => {
 
 		case "EDIT_PASSWORD":
 			if (newState[action.payload.old_reference]) {
-				newState[action.payload.old_reference] = undefined
+				delete newState[action.payload.old_reference]
 			}
 			newState[action.payload.reference] = action.payload.password
 			break
 
 		case "DELETE_PASSWORD":
-			newState[action.payload.reference] = undefined
+			delete newState[action.payload.reference]
 			break
 	}
 

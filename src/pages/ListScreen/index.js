@@ -6,9 +6,11 @@ import {
 	TextInput,
 	Text,
 	StyleSheet,
+	ToastAndroid,
+	Alert,
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import Modal from "react-native-modal"
 import * as Clipboard from "expo-clipboard"
 
@@ -31,15 +33,26 @@ import AddPasswordButton from "../../components/AddPasswordButton"
 export default () => {
 	const navigation = useNavigation()
 	const passwordsData = useSelector((state) => state.passwords.passwords)
+	const dispatch = useDispatch()
 	const [modalVisible, setModalVisible] = useState(false)
 
-	const [isEditMode, setEditMode] = useState(false)
+	const [addPasswordMode, setAddPasswordMode] = useState(false)
+	const [editReferenceMode, setEditReferenceMode] = useState(false)
+	const [editPasswordMode, setEditPasswordMode] = useState(false)
 	const [reference, setReference] = useState("")
+	const [old_reference, setOldReference] = useState("")
 	const [password, setPassword] = useState("")
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
-	const toggleEditMode = () => {
-		setEditMode(!isEditMode)
+	const toggleReferenceEditMode = () => {
+		if (!editReferenceMode) {
+			setOldReference(reference)
+		}
+		setEditReferenceMode(!editReferenceMode)
+	}
+
+	const togglePasswordEditMode = () => {
+		setEditPasswordMode(!editPasswordMode)
 	}
 
 	useEffect(() => {
@@ -66,10 +79,78 @@ export default () => {
 		setModalVisible(true)
 	}
 
+	const handleAddPassword = () => {
+		setAddPasswordMode(true)
+		setReference("")
+		setPassword("")
+		setEditReferenceMode(true)
+		setEditPasswordMode(true)
+		setModalVisible(true)
+	}
+
+	const handleDeleteButton = () => {
+		Alert.alert(
+			"Delete password",
+			"Are you sure you want to delete this password?",
+			[
+				{
+					text: "Cancel",
+					onPress: () => {
+						setEditReferenceMode(false)
+						setEditPasswordMode(false)
+						setModalVisible(false)
+					},
+					style: "cancel",
+				},
+				{
+					text: "Delete",
+					onPress: () => {
+						dispatch({
+							type: "DELETE_PASSWORD",
+							payload: {
+								reference,
+							},
+						})
+						setEditReferenceMode(false)
+						setEditPasswordMode(false)
+						setModalVisible(false)
+					},
+				},
+			],
+			{ cancelable: false }
+		)
+	}
+
 	const handleOkSave = () => {
-		if (isEditMode) {
+		if (addPasswordMode) {
+			// add password
+			dispatch({
+				type: "ADD_PASSWORD",
+				payload: {
+					reference,
+					password,
+				},
+			})
+		} else if (editReferenceMode || editPasswordMode) {
+			if (reference === "" || password === "") {
+				ToastAndroid.show(
+					"Reference and password cannot be empty",
+					ToastAndroid.SHORT
+				)
+				return
+			}
 			// save password
+			dispatch({
+				type: "EDIT_PASSWORD",
+				payload: {
+					reference,
+					password,
+					old_reference,
+				},
+			})
 		}
+		setEditReferenceMode(false)
+		setEditPasswordMode(false)
 		setModalVisible(false)
 	}
 
@@ -86,66 +167,85 @@ export default () => {
 		<Container>
 			<Modal
 				isVisible={modalVisible}
-				style={{ margin: 0, marginLeft: 10, marginRight: 10 }}>
+				style={{ margin: 0, marginLeft: 20, marginRight: 20 }}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>
-						{isEditMode ? "Edit reference" : "Reference"}
+						{editReferenceMode ? "Edit reference" : "Reference"}
 					</Text>
 					<View style={modalStyles.inputContainer}>
 						<TextInput
-							style={modalStyles.input}
-							editable={isEditMode}
+							style={{
+								...modalStyles.input,
+								width: addPasswordMode ? "100%" : "90%",
+							}}
+							editable={editReferenceMode}
 							onChangeText={(text) => setReference(text)}
 							value={reference}
-							placeholder='Reference'
+							placeholder='Enter reference text'
 						/>
-						<TouchableOpacity onPress={toggleEditMode}>
-							<ModalButtonImage source={require("../../assets/edit.png")} />
-						</TouchableOpacity>
-					</View>
-					<Text style={modalStyles.floatLeft}>
-						{isEditMode ? "Edit password" : "Password"}
-						{passwordVisible && " (hold to see and long press to copy)"}
-					</Text>
-					<TouchableOpacity
-						onPressIn={() => setPasswordVisible(true)}
-						onPressOut={() => setPasswordVisible(false)}
-						onLongPress={() => {
-							// copy password to clipboard
-							Clipboard.setString(password)
-						}}
-						style={modalStyles.nomargin}>
-						<View style={modalStyles.inputContainer}>
-							<TextInput
-								style={modalStyles.input}
-								editable={isEditMode}
-								onChangeText={(text) => setPassword(text)}
-								value={password}
-								placeholder='Password'
-								secureTextEntry={!passwordVisible}
-							/>
-							<TouchableOpacity onPress={toggleEditMode}>
+						{!addPasswordMode && (
+							<TouchableOpacity onPress={toggleReferenceEditMode}>
 								<ModalButtonImage source={require("../../assets/edit.png")} />
 							</TouchableOpacity>
-						</View>
-					</TouchableOpacity>
+						)}
+					</View>
+					<Text style={modalStyles.floatLeft}>
+						{editPasswordMode
+							? "Edit password"
+							: "Password (hold to see and long press to copy)"}
+					</Text>
+					<View style={modalStyles.inputContainer}>
+						<TouchableOpacity
+							onPressIn={() => setPasswordVisible(true)}
+							onPressOut={() => setPasswordVisible(false)}
+							onLongPress={() => {
+								if (!editPasswordMode) {
+									// copy password to clipboard
+									Clipboard.setStringAsync(password).then(() => {
+										ToastAndroid.show(
+											"Password copied to clipboard",
+											ToastAndroid.SHORT
+										)
+									})
+								}
+							}}
+							activeOpacity={1}
+							style={{
+								...modalStyles.input,
+								width: addPasswordMode ? "100%" : "90%",
+							}}>
+							<TextInput
+								style={modalStyles.nomargin}
+								editable={editPasswordMode}
+								onChangeText={(text) => setPassword(text)}
+								value={password}
+								placeholder='Enter password'
+								secureTextEntry={!editPasswordMode && !passwordVisible}
+							/>
+						</TouchableOpacity>
+						{!addPasswordMode && (
+							<TouchableOpacity onPress={togglePasswordEditMode}>
+								<ModalButtonImage source={require("../../assets/edit.png")} />
+							</TouchableOpacity>
+						)}
+					</View>
 					<View style={modalStyles.buttonContainer}>
 						<TouchableOpacity
 							style={modalStyles.deleteButton}
-							onPress={() => {}}>
+							onPress={handleDeleteButton}>
 							<Text style={modalStyles.buttonText}>Delete</Text>
 						</TouchableOpacity>
 						<TouchableOpacity
 							style={modalStyles.okButton}
 							onPress={handleOkSave}>
 							<Text style={modalStyles.buttonText}>
-								{isEditMode ? "Save" : "Ok"}
+								{editReferenceMode || editPasswordMode ? "Save" : "Ok"}
 							</Text>
 						</TouchableOpacity>
 					</View>
 				</View>
 			</Modal>
-			<AddPasswordButton onPress={() => {}}></AddPasswordButton>
+			<AddPasswordButton onPress={handleAddPassword}></AddPasswordButton>
 			{Object.keys(passwordsData).length > 0 && (
 				<PasswordsList
 					data={Object.keys(passwordsData)}
@@ -169,6 +269,7 @@ export default () => {
 const modalStyles = StyleSheet.create({
 	nomargin: {
 		margin: 0,
+		color: "#091e42",
 	},
 	floatLeft: {
 		textAlign: "left",
@@ -192,7 +293,6 @@ const modalStyles = StyleSheet.create({
 		padding: 10,
 	},
 	input: {
-		width: "90%",
 		backgroundColor: "#f5f5f5",
 		borderColor: "#dfe1e6",
 		color: "#091e42",

@@ -1,12 +1,8 @@
-import {
-	Box,
-	BoxContainer,
-	Title,
-} from "./styles"
+import { Box, BoxContainer, Title } from "./styles"
 
 export default PasswordItem = ({ reference, onPress }) => {
 	return (
-		<Box onPress={() => onPress(reference)}>
+		<Box underlayColor='#dee0e0' onPress={() => onPress(reference)}>
 			<BoxContainer>
 				<Title
 					style={{
