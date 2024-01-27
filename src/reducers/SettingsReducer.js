@@ -2,6 +2,7 @@ const initialState = {
 	settings: {
 		allowNonBiometric: false,
 		longPressToCopy: false,
+		pinHash: null,
 	},
 }
 
@@ -15,6 +16,10 @@ export default (state = initialState, action) => {
 
 		case "SET_LONG_PRESS_TO_COPY":
 			newState.longPressToCopy = action.payload
+			break
+
+		case "SET_PIN_HASH":
+			newState.pinHash = action.payload
 			break
 	}
 

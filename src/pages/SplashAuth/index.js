@@ -8,11 +8,15 @@ import {
 	Animated,
 	TouchableOpacity,
 	View,
+	Text,
+	Alert,
 } from "react-native"
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import * as LocalAuthentication from "expo-local-authentication"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import * as Crypto from "expo-crypto"
+import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
@@ -26,6 +30,9 @@ export default () => {
 	const navigation = useNavigation()
 	const animationProgress = useRef(new Animated.Value(0))
 	const settings = useSelector((state) => state.settings.settings)
+	const dispatch = useDispatch()
+
+	const [pin, setPin] = useState("")
 
 	const checkSupportedAuthentication = async () => {
 		const types = await LocalAuthentication.supportedAuthenticationTypesAsync()
@@ -101,6 +108,46 @@ export default () => {
 		}).start(() => authenticate())
 	}, [])
 
+	const handlePinInput = async (text) => {
+		setPin(text)
+		if (text.length === 4) {
+			const inputPinHash = await Crypto.digestStringAsync(
+				Crypto.CryptoDigestAlgorithm.SHA256,
+				text
+			)
+			if (settings.pinHash === null) {
+				Alert.alert(
+					"Set PIN",
+					"Would you like to set this PIN for future use?",
+					[
+						{
+							text: "No",
+							onPress: () => {
+								setPin("")
+								return
+							},
+						},
+						{
+							text: "Yes",
+							onPress: async () => {
+								dispatch({
+									type: "SET_PIN_HASH",
+									payload: inputPinHash,
+								})
+								navigation.navigate("List")
+							},
+						},
+					]
+				)
+			} else if (settings.pinHash === inputPinHash) {
+				navigation.navigate("List")
+			} else {
+				ToastAndroid.show("Incorrect PIN", ToastAndroid.SHORT)
+				setPin("")
+			}
+		}
+	}
+
 	if (
 		!checking &&
 		!facialRecognitionAvailable &&
@@ -125,12 +172,35 @@ export default () => {
 
 	return (
 		<View style={styles.main}>
-			<TouchableOpacity onPress={() => authenticate()} style={styles.opacity}>
-				<LottieView
-					source={require("../../assets/splash.json")}
-					progress={animationProgress.current}
+			<LottieView
+				source={require("../../assets/splash.json")}
+				progress={animationProgress.current}
+				style={styles.animation}
+			/>
+			{/* Input with label to enter PIN */}
+			<View style={styles.inputContainer}>
+				<Text style={styles.inputLabel}>
+					{settings.pinHash ? "Enter PIN" : "Set PIN"}
+				</Text>
+				<SmoothPinCodeInput
+					cellStyle={{
+						borderBottomWidth: 2,
+						borderColor: "gray",
+					}}
+					cellStyleFocused={{
+						borderColor: "black",
+					}}
+					value={pin}
+					password
+					onTextChange={(text) => handlePinInput(text)}
 				/>
-			</TouchableOpacity>
+				{/* Button to authenticate with biometrics */}
+				<TouchableOpacity
+					onPress={() => authenticate()}
+					style={styles.biometricsButton}>
+					<Text style={styles.buttonText}>Use Biometrics</Text>
+				</TouchableOpacity>
+			</View>
 		</View>
 	)
 }
@@ -141,8 +211,38 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	opacity: {
+	animation: {
 		width: 400,
 		height: 400,
+	},
+	biometricsButton: {
+		marginTop: 20,
+	},
+	inputContainer: {
+		marginBottom: 20,
+	},
+	inputLabel: {
+		fontFamily: "WorkSans-SemiBold",
+		fontSize: 20,
+		marginBottom: 10,
+	},
+	input: {
+		fontFamily: "WorkSans-Regular",
+		fontSize: 20,
+		padding: 10,
+		borderWidth: 1,
+		borderColor: "#000000",
+		borderRadius: 5,
+		width: 200,
+	},
+	buttonText: {
+		fontFamily: "WorkSans-SemiBold",
+		fontSize: 20,
+		padding: 10,
+		borderWidth: 1,
+		borderColor: "#000000",
+		borderRadius: 5,
+		width: 200,
+		textAlign: "center",
 	},
 })

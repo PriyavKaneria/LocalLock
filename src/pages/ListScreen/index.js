@@ -86,7 +86,6 @@ export default () => {
 			if (nextState === "background") {
 				// The app is in the background
 				// Lock the app
-				const navigation = useNavigation()
 				navigation.navigate("Splash")
 			}
 		}
@@ -99,7 +98,7 @@ export default () => {
 				handleStateChange(AppState.currentState)
 			})
 		}
-	}, [])
+	}, [navigation])
 
 	const handleViewPassword = (reference) => {
 		setReference(reference)
