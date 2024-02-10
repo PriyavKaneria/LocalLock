@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useIsFocused } from "@react-navigation/native"
 import LottieView from "lottie-react-native"
 import { useState, useEffect, useRef } from "react"
 import {
@@ -31,6 +31,7 @@ export default () => {
 	const animationProgress = useRef(new Animated.Value(0))
 	const settings = useSelector((state) => state.settings.settings)
 	const dispatch = useDispatch()
+	const isFocused = useIsFocused()
 
 	const [pin, setPin] = useState("")
 
@@ -68,11 +69,15 @@ export default () => {
 					"Biometric authentication successful",
 					ToastAndroid.SHORT
 				)
-				Animated.timing(animationProgress.current, {
-					toValue: 0,
-					duration: 3500,
-					useNativeDriver: false,
-				}).start(() => navigation.navigate("List"))
+				if (settings.quickBoot) {
+					navigation.navigate("List")
+				} else {
+					Animated.timing(animationProgress.current, {
+						toValue: 0.2,
+						duration: 2000,
+						useNativeDriver: false,
+					}).start(() => navigation.navigate("List"))
+				}
 			} else if (results.error === "unknown") {
 				ToastAndroid.show(
 					"Biometric authentication disabled. Please enable it in your device settings.",
@@ -97,6 +102,7 @@ export default () => {
 	}
 
 	useEffect(() => {
+		animationProgress.current.resetAnimation()
 		BackHandler.addEventListener("hardwareBackPress", () =>
 			BackHandler.exitApp()
 		)
@@ -105,8 +111,23 @@ export default () => {
 			toValue: 1,
 			duration: 3500,
 			useNativeDriver: false,
-		}).start(() => authenticate())
+		}).start()
 	}, [])
+
+	useEffect(() => {
+		if (isFocused) {
+			animationProgress.current.resetAnimation()
+			Animated.timing(animationProgress.current, {
+				toValue: 1,
+				duration: 3500,
+				useNativeDriver: false,
+			}).start(() => authenticate())
+		}
+	}, [isFocused])
+
+	useEffect(() => {
+		if (!checking) authenticate()
+	}, [checking])
 
 	const handlePinInput = async (text) => {
 		setPin(text)
@@ -115,6 +136,7 @@ export default () => {
 				Crypto.CryptoDigestAlgorithm.SHA256,
 				text
 			)
+			setPin("")
 			if (settings.pinHash === null) {
 				Alert.alert(
 					"Set PIN",
