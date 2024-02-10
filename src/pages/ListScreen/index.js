@@ -17,6 +17,7 @@ import * as Clipboard from "expo-clipboard"
 
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
+import CryptoJS from "react-native-crypto-js"
 
 import {
 	Container,
@@ -47,9 +48,6 @@ export default () => {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 
 	const toggleReferenceEditMode = () => {
-		if (!editReferenceMode) {
-			setOldReference(reference.trim())
-		}
 		setEditReferenceMode(!editReferenceMode)
 	}
 
@@ -96,9 +94,14 @@ export default () => {
 		}
 	}, [navigation])
 
-	const handleViewPassword = (reference) => {
-		setReference(reference)
-		setPassword(passwordsData[reference])
+	const handleViewPassword = (_reference) => {
+		setReference(_reference)
+		setOldReference(_reference)
+		const decryptedPassword = CryptoJS.AES.decrypt(
+			passwordsData[_reference],
+			settings.pinHash
+		).toString(CryptoJS.enc.Utf8)
+		setPassword(decryptedPassword)
 		setModalVisible(true)
 	}
 
@@ -163,6 +166,10 @@ export default () => {
 			)
 			return
 		}
+		const encryptedPassword = CryptoJS.AES.encrypt(
+			trimmedPassword,
+			settings.pinHash
+		).toString()
 		if (addPasswordMode) {
 			if (Object.keys(passwordsData).includes(trimmedReference)) {
 				ToastAndroid.show(
@@ -176,7 +183,7 @@ export default () => {
 				type: "ADD_PASSWORD",
 				payload: {
 					reference: trimmedReference,
-					password: trimmedPassword,
+					password: encryptedPassword,
 				},
 			})
 		} else if (editReferenceMode || editPasswordMode) {
@@ -184,8 +191,8 @@ export default () => {
 			dispatch({
 				type: "EDIT_PASSWORD",
 				payload: {
-					trimmedReference,
-					trimmedPassword,
+					reference: trimmedReference,
+					password: encryptedPassword,
 					old_reference,
 				},
 			})

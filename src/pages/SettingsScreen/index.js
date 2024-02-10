@@ -18,6 +18,8 @@ import {
 	Text,
 } from "react-native"
 import * as Crypto from "expo-crypto"
+import CryptoJS from "react-native-crypto-js"
+
 import Modal from "react-native-modal"
 import * as LocalAuthentication from "expo-local-authentication"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
@@ -25,6 +27,7 @@ import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 export default () => {
 	const navigation = useNavigation()
 	const dispatch = useDispatch()
+	const passwordsData = useSelector((state) => state.passwords.passwords)
 	const settings = useSelector((state) => state.settings.settings)
 	const [modalVisible, setModalVisible] = useState(false)
 	const [pin, setPin] = useState("")
@@ -55,6 +58,25 @@ export default () => {
 				Crypto.CryptoDigestAlgorithm.SHA256,
 				text
 			)
+			// Reencrypt all passwords with new PIN hash
+			for (const key in passwordsData) {
+				const decryptedPassword = CryptoJS.AES.decrypt(
+					passwordsData[key],
+					settings.pinHash
+				).toString(CryptoJS.enc.Utf8)
+				const encryptedPassword = CryptoJS.AES.encrypt(
+					decryptedPassword,
+					inputPinHash
+				).toString()
+				dispatch({
+					type: "EDIT_PASSWORD",
+					payload: {
+						old_reference: key,
+						reference: key,
+						password: encryptedPassword,
+					},
+				})
+			}
 			dispatch({
 				type: "SET_PIN_HASH",
 				payload: inputPinHash,

@@ -136,12 +136,14 @@ export default () => {
 				toValue: 1,
 				duration: 3500,
 				useNativeDriver: false,
-			}).start(() => authenticate())
+			}).start(() => {
+				if (!loading) authenticate()
+			})
 		}
 	}, [isFocused])
 
 	useEffect(() => {
-		if (!checking) authenticate()
+		if (!checking && !loading) authenticate()
 	}, [checking])
 
 	const handlePinInput = async (text) => {
