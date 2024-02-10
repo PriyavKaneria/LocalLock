@@ -163,6 +163,23 @@ export default () => {
 					/>
 				</SettingsItem>
 				<SettingsItem>
+					<SettingsItemText>
+						Quick boot app (reduce animations)
+					</SettingsItemText>
+					<Switch
+						trackColor={{ false: "#767577", true: "#81b0ff" }}
+						thumbColor={settings.quickBoot ? "#2a69d4" : "#f4f3f4"}
+						ios_backgroundColor='#3e3e3e'
+						onValueChange={() =>
+							dispatch({
+								type: "SET_QUICK_BOOT",
+								payload: !settings.quickBoot,
+							})
+						}
+						value={settings.quickBoot}
+					/>
+				</SettingsItem>
+				<SettingsItem>
 					<Button title='Reset PIN' onPress={handleResetPin} />
 				</SettingsItem>
 			</ScrollView>
