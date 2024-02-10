@@ -30,10 +30,6 @@ import {
 
 import PasswordItem from "../../components/PasswordItem"
 import AddPasswordButton from "../../components/AddPasswordButton"
-import {
-	ScrollView,
-	TouchableWithoutFeedback,
-} from "react-native-gesture-handler"
 
 export default () => {
 	const navigation = useNavigation()
@@ -52,7 +48,7 @@ export default () => {
 
 	const toggleReferenceEditMode = () => {
 		if (!editReferenceMode) {
-			setOldReference(reference)
+			setOldReference(reference.trim())
 		}
 		setEditReferenceMode(!editReferenceMode)
 	}
@@ -158,29 +154,38 @@ export default () => {
 	}
 
 	const handleOkSave = () => {
+		const trimmedReference = reference.trim()
+		const trimmedPassword = password.trim()
+		if (trimmedReference === "" || trimmedPassword === "") {
+			ToastAndroid.show(
+				"Reference and password cannot be empty",
+				ToastAndroid.SHORT
+			)
+			return
+		}
 		if (addPasswordMode) {
-			// add password
-			dispatch({
-				type: "ADD_PASSWORD",
-				payload: {
-					reference,
-					password,
-				},
-			})
-		} else if (editReferenceMode || editPasswordMode) {
-			if (reference === "" || password === "") {
+			if (Object.keys(passwordsData).includes(trimmedReference)) {
 				ToastAndroid.show(
-					"Reference and password cannot be empty",
+					"Reference with given name already exists",
 					ToastAndroid.SHORT
 				)
 				return
 			}
+			// add password
+			dispatch({
+				type: "ADD_PASSWORD",
+				payload: {
+					reference: trimmedReference,
+					password: trimmedPassword,
+				},
+			})
+		} else if (editReferenceMode || editPasswordMode) {
 			// save password
 			dispatch({
 				type: "EDIT_PASSWORD",
 				payload: {
-					reference,
-					password,
+					trimmedReference,
+					trimmedPassword,
 					old_reference,
 				},
 			})
