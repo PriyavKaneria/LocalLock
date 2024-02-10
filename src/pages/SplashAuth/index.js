@@ -69,6 +69,14 @@ export default () => {
 					"Biometric authentication successful",
 					ToastAndroid.SHORT
 				)
+				if (settings.pinHash === null) {
+					ToastAndroid.show(
+						"Please set a PIN for future use",
+						ToastAndroid.SHORT
+					)
+					setLoading(false)
+					return
+				}
 				if (settings.quickBoot) {
 					navigation.navigate("List")
 				} else {
@@ -90,6 +98,13 @@ export default () => {
 				results.error === "app_cancel"
 			) {
 				// Allow user to use PIN instead
+				if (settings.pinHash === null) {
+					ToastAndroid.show(
+						"Biometric authentication to set new PIN is required",
+						ToastAndroid.SHORT
+					)
+					BackHandler.exitApp()
+				}
 			}
 		} catch (error) {
 			ToastAndroid.show(
@@ -138,29 +153,25 @@ export default () => {
 			)
 			setPin("")
 			if (settings.pinHash === null) {
-				Alert.alert(
-					"Set PIN",
-					"Would you like to set this PIN for future use?",
-					[
-						{
-							text: "No",
-							onPress: () => {
-								setPin("")
-								return
-							},
+				Alert.alert("Set PIN", "Would you like to set this PIN?", [
+					{
+						text: "No",
+						onPress: () => {
+							setPin("")
+							return
 						},
-						{
-							text: "Yes",
-							onPress: async () => {
-								dispatch({
-									type: "SET_PIN_HASH",
-									payload: inputPinHash,
-								})
-								navigation.navigate("List")
-							},
+					},
+					{
+						text: "Yes",
+						onPress: async () => {
+							dispatch({
+								type: "SET_PIN_HASH",
+								payload: inputPinHash,
+							})
+							navigation.navigate("List")
 						},
-					]
-				)
+					},
+				])
 			} else if (settings.pinHash === inputPinHash) {
 				navigation.navigate("List")
 			} else {
