@@ -52,4 +52,5 @@ LockNote is not licensed for public or commercial use. You may use the source co
 ## Credits
 
 Idea: This was made for my father who wanted to store less important passwords which change frequently more securely
+
 Animation credits: Lock animation inspired by [Pathange Balaji Rao](https://lottiefiles.com/balajirao)
