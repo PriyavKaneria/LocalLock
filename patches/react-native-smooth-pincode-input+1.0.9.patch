@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-smooth-pincode-input/src/index.js b/node_modules/react-native-smooth-pincode-input/src/index.js
-index 0a00f22..531d2f3 100644
+index 0a00f22..2ab8085 100644
 --- a/node_modules/react-native-smooth-pincode-input/src/index.js
 +++ b/node_modules/react-native-smooth-pincode-input/src/index.js
 @@ -6,7 +6,6 @@ import {
@@ -15,14 +15,14 @@ index 0a00f22..531d2f3 100644
    restrictToNumbers: PropTypes.bool,
  
 -  containerStyle: ViewPropTypes.style,
-+  containerStyle: PropTypes.style,
++  containerStyle: PropTypes.objectOf(PropTypes.string),
  
 -  cellStyle: ViewPropTypes.style,
 -  cellStyleFocused: ViewPropTypes.style,
 -  cellStyleFilled: ViewPropTypes.style,
-+  cellStyle: PropTypes.style,
-+  cellStyleFocused: PropTypes.style,
-+  cellStyleFilled: PropTypes.style,
++  cellStyle: PropTypes.objectOf(PropTypes.string),
++  cellStyleFocused: PropTypes.objectOf(PropTypes.string),
++  cellStyleFilled: PropTypes.objectOf(PropTypes.string),
  
    textStyle: Text.propTypes.style,
    textStyleFocused: Text.propTypes.style,

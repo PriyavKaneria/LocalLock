@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from "react"
+import { useState, useEffect, useLayoutEffect, useRef } from "react"
 import {
 	BackHandler,
 	View,
@@ -59,6 +59,11 @@ export default () => {
 		BackHandler.addEventListener("hardwareBackPress", () =>
 			BackHandler.exitApp()
 		)
+		return () => {
+			BackHandler.removeEventListener("hardwareBackPress", () =>
+				BackHandler.exitApp()
+			)
+		}
 	}, [])
 
 	useLayoutEffect(() => {
@@ -115,7 +120,7 @@ export default () => {
 	}
 
 	const handleDeleteButton = () => {
-		if (addPasswordMode) {
+		if (addPasswordMode || editReferenceMode || editPasswordMode) {
 			setAddPasswordMode(false)
 			setEditReferenceMode(false)
 			setEditPasswordMode(false)
@@ -239,7 +244,7 @@ export default () => {
 						<TextInput
 							style={{
 								...modalStyles.input,
-								width: addPasswordMode ? "100%" : "90%",
+								width: addPasswordMode || editReferenceMode ? "100%" : "90%",
 							}}
 							editable={editReferenceMode}
 							onChangeText={(text) => setReference(text)}
@@ -248,7 +253,9 @@ export default () => {
 						/>
 						{!addPasswordMode && (
 							<TouchableOpacity onPress={toggleReferenceEditMode}>
-								<ModalButtonImage source={require("../../assets/edit.png")} />
+								{!editReferenceMode && (
+									<ModalButtonImage source={require("../../assets/edit.png")} />
+								)}
 							</TouchableOpacity>
 						)}
 					</View>
@@ -277,7 +284,7 @@ export default () => {
 							activeOpacity={1}
 							style={{
 								...modalStyles.input,
-								width: addPasswordMode ? "100%" : "90%",
+								width: addPasswordMode || editPasswordMode ? "100%" : "90%",
 							}}>
 							<TextInput
 								style={modalStyles.nomargin}
@@ -290,7 +297,9 @@ export default () => {
 						</TouchableOpacity>
 						{!addPasswordMode && (
 							<TouchableOpacity onPress={togglePasswordEditMode}>
-								<ModalButtonImage source={require("../../assets/edit.png")} />
+								{!editPasswordMode && (
+									<ModalButtonImage source={require("../../assets/edit.png")} />
+								)}
 							</TouchableOpacity>
 						)}
 					</View>

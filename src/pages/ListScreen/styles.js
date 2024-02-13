@@ -16,8 +16,8 @@ export const AddButtonImage = styled.Image`
 `
 
 export const ModalButtonImage = styled.Image`
-	width: 32px;
-	height: 32px;
+	width: 30px;
+	height: 30px;
 `
 
 export const PasswordsList = styled.FlatList`

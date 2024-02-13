@@ -27,6 +27,7 @@ export default () => {
 	const [irisAvailable, setIrisAvailable] = useState(false)
 	const [checking, setChecking] = useState(true)
 	const [loading, setLoading] = useState(false)
+	const [authenticated, setAuthenticated] = useState(false)
 	const navigation = useNavigation()
 	const animationProgress = useRef(new Animated.Value(0))
 	const settings = useSelector((state) => state.settings.settings)
@@ -77,6 +78,7 @@ export default () => {
 					setLoading(false)
 					return
 				}
+				setAuthenticated(true)
 				if (settings.quickBoot) {
 					navigation.navigate("List")
 				} else {
@@ -130,6 +132,7 @@ export default () => {
 	}, [])
 
 	useEffect(() => {
+		setAuthenticated(false)
 		if (isFocused) {
 			animationProgress.current.resetAnimation()
 			Animated.timing(animationProgress.current, {
@@ -137,13 +140,13 @@ export default () => {
 				duration: 3500,
 				useNativeDriver: false,
 			}).start(() => {
-				if (!loading) authenticate()
+				if (!checking && !loading && !authenticated) authenticate()
 			})
 		}
 	}, [isFocused])
 
 	useEffect(() => {
-		if (!checking && !loading) authenticate()
+		if (!checking && !loading && !authenticated) authenticate()
 	}, [checking])
 
 	const handlePinInput = async (text) => {

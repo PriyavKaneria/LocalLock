@@ -8,7 +8,7 @@ import {
 } from "./styles"
 import { useNavigation } from "@react-navigation/native"
 import { useDispatch, useSelector } from "react-redux"
-import { useLayoutEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 import {
 	Button,
 	StyleSheet,
@@ -44,6 +44,9 @@ export default () => {
 				</AddButton>
 			),
 		})
+	}, [])
+
+	useEffect(() => {
 		BackHandler.addEventListener("hardwareBackPress", () => {
 			setPin("")
 			setModalVisible(false)
