@@ -47,11 +47,17 @@ export default () => {
 	}, [])
 
 	useEffect(() => {
-		BackHandler.addEventListener("hardwareBackPress", () => {
-			setPin("")
-			setModalVisible(false)
-			navigation.navigate("List")
-		})
+		const backHandler = BackHandler.addEventListener(
+			"hardwareBackPress",
+			() => {
+				setPin("")
+				setModalVisible(false)
+				navigation.navigate("List")
+			}
+		)
+		return () => {
+			backHandler.remove()
+		}
 	}, [])
 
 	const handlePinInput = async (text) => {

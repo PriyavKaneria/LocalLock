@@ -120,7 +120,7 @@ export default () => {
 
 	useEffect(() => {
 		animationProgress.current.resetAnimation()
-		BackHandler.addEventListener("hardwareBackPress", () =>
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", () =>
 			BackHandler.exitApp()
 		)
 		checkSupportedAuthentication()
@@ -129,6 +129,7 @@ export default () => {
 			duration: 3500,
 			useNativeDriver: false,
 		}).start()
+		return () => backHandler.remove()
 	}, [])
 
 	useEffect(() => {

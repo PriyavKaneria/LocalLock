@@ -56,13 +56,11 @@ export default () => {
 	}
 
 	useEffect(() => {
-		BackHandler.addEventListener("hardwareBackPress", () =>
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", () =>
 			BackHandler.exitApp()
 		)
 		return () => {
-			BackHandler.removeEventListener("hardwareBackPress", () =>
-				BackHandler.exitApp()
-			)
+			backHandler.remove()
 		}
 	}, [])
 
