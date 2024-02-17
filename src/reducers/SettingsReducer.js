@@ -3,7 +3,6 @@ const initialState = {
 		allowNonBiometric: false,
 		longPressToCopy: false,
 		quickBoot: false,
-		pinHash: null,
 	},
 }
 
@@ -21,10 +20,6 @@ export default (state = initialState, action) => {
 
 		case "SET_QUICK_BOOT":
 			newState.quickBoot = action.payload
-			break
-
-		case "SET_PIN_HASH":
-			newState.pinHash = action.payload
 			break
 	}
 

@@ -1,8 +1,8 @@
-# LockNote
+# LocalLock
 
-LockNote is an Android app with the only goal of being a secure, locked, no-third party, completely local open source password saving app
+LocalLock is an Android app with the only goal of being a secure, locked, no-third party, completely local open source password saving app
 
-![LockNote Screenshot](./assets/screenshot_github.png)
+![LocalLock Screenshot](./assets/screenshot_github.png)
 
 ## Features
 
@@ -19,7 +19,7 @@ LockNote is an Android app with the only goal of being a secure, locked, no-thir
 
 ## Installation
 
-You can install LockNote using npm or yarn:
+You can install LocalLock using npm or yarn:
 
 ```bash
 npm install
@@ -29,7 +29,7 @@ yarn install
 
 ## Usage
 
-> Expo is required to run LockNote. If you don't have Expo installed, you can install it using the following command:
+> Expo is required to run LocalLock. If you don't have Expo installed, you can install it using the following command:
 
 ```bash
 npm install -g expo-cli
@@ -37,7 +37,7 @@ npm install -g expo-cli
 yarn global add expo-cli
 ```
 
-To run LockNote, use the following command:
+To run LocalLock, use the following command:
 
 ```bash
 npm start
@@ -47,7 +47,7 @@ yarn start
 
 ## License
 
-LockNote is not licensed for public or commercial use. You may use the source code for educational purposes only.
+LocalLock is not licensed for public or commercial use. You may use the source code for educational purposes only.
 
 ## Credits
 

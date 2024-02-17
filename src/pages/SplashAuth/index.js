@@ -17,6 +17,7 @@ import * as LocalAuthentication from "expo-local-authentication"
 import { useDispatch, useSelector } from "react-redux"
 import * as Crypto from "expo-crypto"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
+import * as SecureStore from "expo-secure-store"
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
@@ -31,7 +32,6 @@ export default () => {
 	const navigation = useNavigation()
 	const animationProgress = useRef(new Animated.Value(0))
 	const settings = useSelector((state) => state.settings.settings)
-	const dispatch = useDispatch()
 	const isFocused = useIsFocused()
 
 	const [pin, setPin] = useState("")
@@ -70,7 +70,8 @@ export default () => {
 					"Biometric authentication successful",
 					ToastAndroid.SHORT
 				)
-				if (settings.pinHash === null) {
+				const pinHash = await SecureStore.getItemAsync("pinHash");
+				if (!pinHash) {
 					ToastAndroid.show(
 						"Please set a PIN for future use",
 						ToastAndroid.SHORT
@@ -100,7 +101,8 @@ export default () => {
 				results.error === "app_cancel"
 			) {
 				// Allow user to use PIN instead
-				if (settings.pinHash === null) {
+				const pinHash = await SecureStore.getItemAsync("pinHash");
+				if (!pinHash) {
 					ToastAndroid.show(
 						"Biometric authentication to set new PIN is required",
 						ToastAndroid.SHORT
@@ -158,7 +160,8 @@ export default () => {
 				text
 			)
 			setPin("")
-			if (settings.pinHash === null) {
+			const pinHash = await SecureStore.getItemAsync("pinHash");
+			if (!pinHash) {
 				Alert.alert("Set PIN", "Would you like to set this PIN?", [
 					{
 						text: "No",
@@ -170,15 +173,12 @@ export default () => {
 					{
 						text: "Yes",
 						onPress: async () => {
-							dispatch({
-								type: "SET_PIN_HASH",
-								payload: inputPinHash,
-							})
+							await SecureStore.setItemAsync("pinHash", inputPinHash)
 							navigation.navigate("List")
 						},
 					},
 				])
-			} else if (settings.pinHash === inputPinHash) {
+			} else if (inputPinHash === pinHash.password) {
 				navigation.navigate("List")
 			} else {
 				ToastAndroid.show("Incorrect PIN", ToastAndroid.SHORT)

@@ -23,6 +23,7 @@ import CryptoJS from "react-native-crypto-js"
 import Modal from "react-native-modal"
 import * as LocalAuthentication from "expo-local-authentication"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
+import * as SecureStore from "expo-secure-store"
 
 export default () => {
 	const navigation = useNavigation()
@@ -63,6 +64,15 @@ export default () => {
 	const handlePinInput = async (text) => {
 		setPin(text)
 		if (text.length === 4) {
+			const pinHash = await SecureStore.getItemAsync("pinHash")
+			if (!pinHash) {
+				ToastAndroid.show(
+					"PIN not set. Please set a PIN to save passwords",
+					ToastAndroid.SHORT
+				)
+				navigation.navigate("Splash")
+				return
+			}
 			const inputPinHash = await Crypto.digestStringAsync(
 				Crypto.CryptoDigestAlgorithm.SHA256,
 				text
@@ -71,7 +81,7 @@ export default () => {
 			for (const key in passwordsData) {
 				const decryptedPassword = CryptoJS.AES.decrypt(
 					passwordsData[key],
-					settings.pinHash
+					pinHash
 				).toString(CryptoJS.enc.Utf8)
 				const encryptedPassword = CryptoJS.AES.encrypt(
 					decryptedPassword,
@@ -86,10 +96,7 @@ export default () => {
 					},
 				})
 			}
-			dispatch({
-				type: "SET_PIN_HASH",
-				payload: inputPinHash,
-			})
+			await SecureStore.setItemAsync("pinHash", inputPinHash)
 			ToastAndroid.show("New PIN set", ToastAndroid.SHORT)
 			setPin("")
 			setModalVisible(false)

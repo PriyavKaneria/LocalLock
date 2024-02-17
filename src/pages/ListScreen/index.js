@@ -18,6 +18,7 @@ import * as Clipboard from "expo-clipboard"
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import CryptoJS from "react-native-crypto-js"
+import * as SecureStore from 'expo-secure-store';
 
 import {
 	Container,
@@ -97,12 +98,21 @@ export default () => {
 		}
 	}, [navigation])
 
-	const handleViewPassword = (_reference) => {
+	const handleViewPassword = async (_reference) => {
 		setReference(_reference)
 		setOldReference(_reference)
+		const pinHash = await SecureStore.getItemAsync("pinHash");
+		if (!pinHash) {
+			ToastAndroid.show(
+				"PIN not set. Please set a PIN to view passwords",
+				ToastAndroid.SHORT
+			)
+			navigation.navigate("Splash")
+			return
+		}
 		const decryptedPassword = CryptoJS.AES.decrypt(
 			passwordsData[_reference],
-			settings.pinHash
+			pinHash
 		).toString(CryptoJS.enc.Utf8)
 		setPassword(decryptedPassword)
 		setModalVisible(true)
@@ -159,7 +169,7 @@ export default () => {
 		)
 	}
 
-	const handleOkSave = () => {
+	const handleOkSave = async () => {
 		const trimmedReference = reference.trim()
 		const trimmedPassword = password.trim()
 		if (trimmedReference === "" || trimmedPassword === "") {
@@ -169,9 +179,18 @@ export default () => {
 			)
 			return
 		}
+		const pinHash = await SecureStore.getItemAsync("pinHash");
+		if (!pinHash) {
+			ToastAndroid.show(
+				"PIN not set. Please set a PIN to save passwords",
+				ToastAndroid.SHORT
+			)
+			navigation.navigate("Splash")
+			return
+		}
 		const encryptedPassword = CryptoJS.AES.encrypt(
 			trimmedPassword,
-			settings.pinHash
+			pinHash
 		).toString()
 		if (addPasswordMode) {
 			if (Object.keys(passwordsData).includes(trimmedReference)) {
