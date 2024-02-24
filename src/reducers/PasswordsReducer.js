@@ -1,7 +1,5 @@
 const initialState = {
-	passwords: {
-		RIL: "123456",
-	},
+	passwords: {},
 }
 
 export default (state = initialState, action) => {

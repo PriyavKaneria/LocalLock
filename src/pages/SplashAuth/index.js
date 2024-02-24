@@ -33,6 +33,7 @@ export default () => {
 	const animationProgress = useRef(new Animated.Value(0))
 	const settings = useSelector((state) => state.settings.settings)
 	const isFocused = useIsFocused()
+	const [isPinSet, setIsPinSet] = useState(false)
 
 	const [pin, setPin] = useState("")
 
@@ -70,7 +71,7 @@ export default () => {
 					"Biometric authentication successful",
 					ToastAndroid.SHORT
 				)
-				const pinHash = await SecureStore.getItemAsync("pinHash");
+				const pinHash = await SecureStore.getItemAsync("pinHash")
 				if (!pinHash) {
 					ToastAndroid.show(
 						"Please set a PIN for future use",
@@ -101,7 +102,7 @@ export default () => {
 				results.error === "app_cancel"
 			) {
 				// Allow user to use PIN instead
-				const pinHash = await SecureStore.getItemAsync("pinHash");
+				const pinHash = await SecureStore.getItemAsync("pinHash")
 				if (!pinHash) {
 					ToastAndroid.show(
 						"Biometric authentication to set new PIN is required",
@@ -152,6 +153,16 @@ export default () => {
 		if (!checking && !loading && !authenticated) authenticate()
 	}, [checking])
 
+	useEffect(() => {
+		async function checkPin() {
+			const pinHash = await SecureStore.getItemAsync("pinHash")
+			if (pinHash) {
+				setIsPinSet(true)
+			}
+		}
+		checkPin()
+	}, [])
+
 	const handlePinInput = async (text) => {
 		setPin(text)
 		if (text.length === 4) {
@@ -160,7 +171,7 @@ export default () => {
 				text
 			)
 			setPin("")
-			const pinHash = await SecureStore.getItemAsync("pinHash");
+			const pinHash = await SecureStore.getItemAsync("pinHash")
 			if (!pinHash) {
 				Alert.alert("Set PIN", "Would you like to set this PIN?", [
 					{
@@ -178,7 +189,7 @@ export default () => {
 						},
 					},
 				])
-			} else if (inputPinHash === pinHash.password) {
+			} else if (inputPinHash === pinHash) {
 				navigation.navigate("List")
 			} else {
 				ToastAndroid.show("Incorrect PIN", ToastAndroid.SHORT)
@@ -219,7 +230,7 @@ export default () => {
 			{/* Input with label to enter PIN */}
 			<View style={styles.inputContainer}>
 				<Text style={styles.inputLabel}>
-					{settings.pinHash ? "Enter PIN" : "Set PIN"}
+					{isPinSet ? "Enter PIN" : "Set PIN"}
 				</Text>
 				<SmoothPinCodeInput
 					cellStyle={{
