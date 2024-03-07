@@ -4,6 +4,7 @@
 
 LocalLock is an Android app with the only goal of being a secure, locked, no-third party, completely local open source password saving app
 
+Playstore link - https://play.google.com/store/apps/details?id=com.diginova.locallock
 
 ## Features
 
