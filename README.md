@@ -1,8 +1,9 @@
+![LocalLock Screenshot](./assets/feature-graphic.png)
+
 # LocalLock
 
 LocalLock is an Android app with the only goal of being a secure, locked, no-third party, completely local open source password saving app
 
-![LocalLock Screenshot](./assets/screenshot_github.png)
 
 ## Features
 
@@ -16,6 +17,16 @@ LocalLock is an Android app with the only goal of being a secure, locked, no-thi
 - PIN based authentication
 - Easily copy passwords to clipboard
 - Easily reset PIN if forgotten
+
+## Screenshots
+
+<p float="left">
+    <img src="./assets/ss1.jpg" width="100" />
+    <img src="./assets/ss2.jpg" width="100" />
+    <img src="./assets/ss3.jpg" width="100" />
+    <img src="./assets/ss4.jpg" width="100" />
+    <img src="./assets/ss5.jpg" width="100" />
+</p>
 
 ## Installation
 
