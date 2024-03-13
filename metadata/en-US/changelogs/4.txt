@@ -1,0 +1,7 @@
+* Playstore app release
+
+* All screens implemented - splash (auth), list, settings
+
+* Secure async storage using AES encryption
+
+* Key hidden using android keystore
