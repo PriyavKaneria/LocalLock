@@ -19,6 +19,13 @@ Playstore link - https://play.google.com/store/apps/details?id=com.diginova.loca
 - Easily copy passwords to clipboard
 - Easily reset PIN if forgotten
 
+## Upcoming features
+
+- Dark mode
+- QR code based device to device offline sync
+- Additional fields to store links and documents
+- Encrypted export for backup and restore via import
+
 ## Screenshots
 
 <p float="left">
