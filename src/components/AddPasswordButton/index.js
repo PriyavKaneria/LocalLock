@@ -1,12 +1,13 @@
-import {
-	Box,
-	BoxContainer,
-	Title,
-} from "./styles"
+import { Box, BoxContainer, Title } from "./styles"
 
-export default AddPasswordButton = ({ onPress }) => {
+export default AddPasswordButton = ({ onPress, darkMode }) => {
 	return (
-		<Box underlayColor='#dee0e0' onPress={() => onPress()}>
+		<Box
+			underlayColor={darkMode ? "#71e39d" : "#dee0e0"}
+			style={{
+				backgroundColor: darkMode ? "#6be397" : "#f5f5f5",
+			}}
+			onPress={() => onPress()}>
 			<BoxContainer>
 				<Title
 					style={{

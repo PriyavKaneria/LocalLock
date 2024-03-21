@@ -24,6 +24,7 @@ import Modal from "react-native-modal"
 import * as LocalAuthentication from "expo-local-authentication"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import * as SecureStore from "expo-secure-store"
+import { setStatusBarStyle } from "expo-status-bar"
 
 export default () => {
 	const navigation = useNavigation()
@@ -33,7 +34,7 @@ export default () => {
 	const [modalVisible, setModalVisible] = useState(false)
 	const [pin, setPin] = useState("")
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		navigation.setOptions({
 			title: "Settings",
 			headerLeft: false,
@@ -41,11 +42,14 @@ export default () => {
 				<AddButton
 					underlayColor='transparent'
 					onPress={() => navigation.navigate("List")}>
-					<AddButtonImage source={require("../../assets/exit.png")} />
+					<AddButtonImage
+						source={require("../../assets/exit.png")}
+						style={{ tintColor: settings.darkMode ? "#fbfbfb" : "#000000" }}
+					/>
 				</AddButton>
 			),
 		})
-	}, [])
+	}, [settings.darkMode])
 
 	useEffect(() => {
 		const backHandler = BackHandler.addEventListener(
@@ -134,8 +138,46 @@ export default () => {
 		}
 	}
 
+	const modalStyles = StyleSheet.create({
+		floatCenter: {
+			textAlign: "center",
+		},
+		root: {
+			flexDirection: "column",
+			justifyContent: "center",
+			alignItems: "center",
+			padding: 10,
+			paddingTop: 20,
+			paddingBottom: 20,
+			backgroundColor: settings.darkMode ? "#171717" : "#f5f5f5", // dark or light gray background
+		},
+		inputContainer: {
+			flexDirection: "row",
+			justifyContent: "center",
+			marginBottom: 10,
+			padding: 10,
+		},
+	})
+	const screenStyles = StyleSheet.create({
+		root: {
+			backgroundColor: settings.darkMode ? "#171717" : "#f5f5f5", // dark or light gray background
+		},
+		textColor: {
+			color: settings.darkMode ? "white" : "black",
+		},
+		trackColor: {
+			false: "#767577",
+			true: "#81b0ff",
+		},
+		thumbColor: {
+			false: "#f4f3f4",
+			true: "#2a69d4",
+		},
+		iosBackgroundColor: "#3e3e3e",
+	})
+
 	return (
-		<Container>
+		<Container style={screenStyles.root}>
 			<Modal
 				animationIn={"zoomIn"}
 				animationOut={"zoomOut"}
@@ -158,7 +200,10 @@ export default () => {
 								borderColor: "gray",
 							}}
 							cellStyleFocused={{
-								borderColor: "black",
+								borderColor: settings.darkMode ? "white" : "black",
+							}}
+							textStyleFocused={{
+								color: settings.darkMode ? "white" : "black",
 							}}
 							password
 							value={pin}
@@ -169,13 +214,17 @@ export default () => {
 			</Modal>
 			<ScrollView>
 				<SettingsItem>
-					<SettingsItemText>
+					<SettingsItemText style={screenStyles.textColor}>
 						Allow non-biometric authentication
 					</SettingsItemText>
 					<Switch
-						trackColor={{ false: "#767577", true: "#81b0ff" }}
-						thumbColor={settings.allowNonBiometric ? "#2a69d4" : "#f4f3f4"}
-						ios_backgroundColor='#3e3e3e'
+						trackColor={screenStyles.trackColor}
+						thumbColor={
+							settings.allowNonBiometric
+								? screenStyles.thumbColor.true
+								: screenStyles.thumbColor.false
+						}
+						ios_backgroundColor={screenStyles.iosBackgroundColor}
 						onValueChange={() =>
 							dispatch({
 								type: "SET_ALLOW_NON_BIOMETRIC",
@@ -186,11 +235,17 @@ export default () => {
 					/>
 				</SettingsItem>
 				<SettingsItem>
-					<SettingsItemText>Long press to copy password</SettingsItemText>
+					<SettingsItemText style={screenStyles.textColor}>
+						Long press to copy password
+					</SettingsItemText>
 					<Switch
-						trackColor={{ false: "#767577", true: "#81b0ff" }}
-						thumbColor={settings.longPressToCopy ? "#2a69d4" : "#f4f3f4"}
-						ios_backgroundColor='#3e3e3e'
+						trackColor={screenStyles.trackColor}
+						thumbColor={
+							settings.longPressToCopy
+								? screenStyles.thumbColor.true
+								: screenStyles.thumbColor.false
+						}
+						ios_backgroundColor={screenStyles.iosBackgroundColor}
 						onValueChange={() =>
 							dispatch({
 								type: "SET_LONG_PRESS_TO_COPY",
@@ -201,13 +256,17 @@ export default () => {
 					/>
 				</SettingsItem>
 				<SettingsItem>
-					<SettingsItemText>
+					<SettingsItemText style={screenStyles.textColor}>
 						Quick boot app (reduce animations)
 					</SettingsItemText>
 					<Switch
-						trackColor={{ false: "#767577", true: "#81b0ff" }}
-						thumbColor={settings.quickBoot ? "#2a69d4" : "#f4f3f4"}
-						ios_backgroundColor='#3e3e3e'
+						trackColor={screenStyles.trackColor}
+						thumbColor={
+							settings.quickBoot
+								? screenStyles.thumbColor.true
+								: screenStyles.thumbColor.false
+						}
+						ios_backgroundColor={screenStyles.iosBackgroundColor}
 						onValueChange={() =>
 							dispatch({
 								type: "SET_QUICK_BOOT",
@@ -218,73 +277,30 @@ export default () => {
 					/>
 				</SettingsItem>
 				<SettingsItem>
+					<SettingsItemText style={screenStyles.textColor}>
+						Dark mode
+					</SettingsItemText>
+					<Switch
+						trackColor={screenStyles.trackColor}
+						thumbColor={
+							settings.darkMode
+								? screenStyles.thumbColor.true
+								: screenStyles.thumbColor.false
+						}
+						ios_backgroundColor={screenStyles.iosBackgroundColor}
+						onValueChange={() => {
+							dispatch({
+								type: "SET_DARK_MODE",
+								payload: !settings.darkMode,
+							})
+						}}
+						value={settings.darkMode}
+					/>
+				</SettingsItem>
+				<SettingsItem>
 					<Button title='Reset PIN' onPress={handleResetPin} />
 				</SettingsItem>
 			</ScrollView>
 		</Container>
 	)
 }
-
-const modalStyles = StyleSheet.create({
-	nomargin: {
-		margin: 0,
-		color: "#091e42",
-	},
-	floatCenter: {
-		textAlign: "center",
-	},
-	root: {
-		flexDirection: "column",
-		justifyContent: "center",
-		alignItems: "center",
-		padding: 10,
-		paddingTop: 20,
-		paddingBottom: 20,
-		backgroundColor: "#f5f5f5", // light gray background
-	},
-	inputContainer: {
-		flexDirection: "row",
-		justifyContent: "center",
-		marginBottom: 10,
-		padding: 10,
-	},
-	input: {
-		backgroundColor: "#f5f5f5",
-		borderColor: "#dfe1e6",
-		color: "#091e42",
-		borderRadius: 3,
-		borderWidth: 2,
-		borderStyle: "solid",
-		fontSize: 20,
-		paddingLeft: 8,
-		paddingRight: 8,
-		paddingTop: 6,
-		paddingBottom: 6,
-		height: 36,
-		marginRight: 5,
-	},
-	buttonContainer: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		width: "100%",
-	},
-	deleteButton: {
-		backgroundColor: "red", // red background
-		padding: 10,
-		borderRadius: 5,
-		width: "45%",
-		alignItems: "center",
-	},
-	okButton: {
-		backgroundColor: "green", // green background
-		padding: 10,
-		borderRadius: 5,
-		width: "45%",
-		alignItems: "center",
-	},
-	buttonText: {
-		color: "white", // white text
-		fontWeight: "bold",
-		fontSize: 16,
-	},
-})

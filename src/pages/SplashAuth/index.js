@@ -220,6 +220,8 @@ export default () => {
 		return <AppLoading />
 	}
 
+	styles.main.backgroundColor = settings.darkMode ? "#171717" : "#f5f5f5"
+
 	return (
 		<View style={styles.main}>
 			<LottieView
@@ -260,6 +262,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+		backgroundColor: "#f5f5f5",
 	},
 	animation: {
 		width: 400,

@@ -2,7 +2,6 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   flex: 1;
-  background: #fff;
 `;
 
 export const SettingsItem = styled.View`
@@ -14,7 +13,6 @@ export const SettingsItem = styled.View`
 
 export const SettingsItemText = styled.Text`
   font-size: 16px;
-  color: #091e42;
 `;
 
 export const AddButton = styled.TouchableHighlight`

@@ -18,7 +18,7 @@ import * as Clipboard from "expo-clipboard"
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import CryptoJS from "react-native-crypto-js"
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store"
 
 import {
 	Container,
@@ -65,7 +65,7 @@ export default () => {
 		}
 	}, [])
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		navigation.setOptions({
 			title: "Passwords",
 			headerLeft: false,
@@ -73,11 +73,14 @@ export default () => {
 				<AddButton
 					underlayColor='transparent'
 					onPress={() => navigation.navigate("Settings")}>
-					<AddButtonImage source={require("../../assets/settings.png")} />
+					<AddButtonImage
+						source={require("../../assets/settings.png")}
+						style={{ tintColor: settings.darkMode ? "#fbfbfb" : "#000000" }}
+					/>
 				</AddButton>
 			),
 		})
-	}, [])
+	}, [settings.darkMode])
 
 	useEffect(() => {
 		const handleStateChange = (nextState) => {
@@ -101,7 +104,7 @@ export default () => {
 	const handleViewPassword = async (_reference) => {
 		setReference(_reference)
 		setOldReference(_reference)
-		const pinHash = await SecureStore.getItemAsync("pinHash");
+		const pinHash = await SecureStore.getItemAsync("pinHash")
 		if (!pinHash) {
 			ToastAndroid.show(
 				"PIN not set. Please set a PIN to view passwords",
@@ -179,7 +182,7 @@ export default () => {
 			)
 			return
 		}
-		const pinHash = await SecureStore.getItemAsync("pinHash");
+		const pinHash = await SecureStore.getItemAsync("pinHash")
 		if (!pinHash) {
 			ToastAndroid.show(
 				"PIN not set. Please set a PIN to save passwords",
@@ -234,8 +237,91 @@ export default () => {
 		return <AppLoading />
 	}
 
+	const modalStyles = StyleSheet.create({
+		nomargin: {
+			margin: 0,
+			color: settings.darkMode ? "#e8e8e8" : "black",
+		},
+		floatLeft: {
+			textAlign: "left",
+			alignSelf: "flex-start",
+			paddingLeft: 10,
+			color: settings.darkMode ? "#0f2b23" : "black",
+		},
+		root: {
+			flexDirection: "column",
+			justifyContent: "center",
+			alignItems: "center",
+			padding: 10,
+			paddingTop: 20,
+			paddingBottom: 20,
+			backgroundColor: settings.darkMode ? "#3d8a74" : "#f5f5f5",
+			color: settings.darkMode ? "#e8e8e8" : "#091e42",
+		},
+		inputContainer: {
+			flexDirection: "row",
+			width: "100%",
+			marginBottom: 10,
+			marginLeft: 0,
+			padding: 10,
+		},
+		input: {
+			backgroundColor: settings.darkMode ? "#184d3e" : "#f5f5f5",
+			borderColor: settings.darkMode ? "#545454" : "#dfe1e6",
+			color: settings.darkMode ? "#e4e4e4" : "#091e42",
+			borderRadius: 3,
+			borderWidth: 2,
+			borderStyle: "solid",
+			fontSize: 20,
+			paddingLeft: 8,
+			paddingRight: 8,
+			paddingTop: 6,
+			paddingBottom: 6,
+			height: 36,
+			marginRight: 5,
+		},
+		buttonContainer: {
+			flexDirection: "row",
+			justifyContent: "space-between",
+			width: "100%",
+			paddingLeft: 10,
+			paddingRight: 10,
+		},
+		deleteButton: {
+			backgroundColor: settings.darkMode ? "#eb5746" : "red", // red background
+			padding: 10,
+			borderRadius: 5,
+			width: "45%",
+			alignItems: "center",
+		},
+		okButton: {
+			backgroundColor: settings.darkMode ? "#5cedc4" : "green", // green background
+			padding: 10,
+			borderRadius: 5,
+			width: "45%",
+			alignItems: "center",
+		},
+		buttonText: {
+			color: settings.darkMode ? "black" : "white",
+			fontWeight: "bold",
+			fontSize: 16,
+		},
+	})
+
+	const screenStyles = StyleSheet.create({
+		root: {
+			backgroundColor: settings.darkMode ? "#252526" : "#ffffff",
+		},
+		textColor: {
+			color: settings.darkMode ? "#e8e8e8" : "black",
+		},
+		image: {
+			tintColor: settings.darkMode ? "#1e1e1e" : "black",
+		},
+	})
+
 	return (
-		<Container>
+		<Container style={screenStyles.root}>
 			<Modal
 				animationIn={"zoomIn"}
 				animationOut={"zoomOut"}
@@ -267,11 +353,15 @@ export default () => {
 							onChangeText={(text) => setReference(text)}
 							value={reference}
 							placeholder='Enter reference text'
+							placeholderTextColor={settings.darkMode ? "#9dcfaf" : "#a3a3a3"}
 						/>
 						{!addPasswordMode && (
 							<TouchableOpacity onPress={toggleReferenceEditMode}>
 								{!editReferenceMode && (
-									<ModalButtonImage source={require("../../assets/edit.png")} />
+									<ModalButtonImage
+										source={require("../../assets/edit.png")}
+										style={screenStyles.image}
+									/>
 								)}
 							</TouchableOpacity>
 						)}
@@ -309,13 +399,17 @@ export default () => {
 								onChangeText={(text) => setPassword(text)}
 								value={password}
 								placeholder='Enter password'
+								placeholderTextColor={settings.darkMode ? "#9dcfaf" : "#a3a3a3"}
 								secureTextEntry={!editPasswordMode && !passwordVisible}
 							/>
 						</TouchableOpacity>
 						{!addPasswordMode && (
 							<TouchableOpacity onPress={togglePasswordEditMode}>
 								{!editPasswordMode && (
-									<ModalButtonImage source={require("../../assets/edit.png")} />
+									<ModalButtonImage
+										source={require("../../assets/edit.png")}
+										style={screenStyles.image}
+									/>
 								)}
 							</TouchableOpacity>
 						)}
@@ -338,19 +432,31 @@ export default () => {
 					</View>
 				</View>
 			</Modal>
-			<AddPasswordButton onPress={handleAddPassword}></AddPasswordButton>
+			<AddPasswordButton
+				onPress={handleAddPassword}
+				darkMode={settings.darkMode}
+			/>
 			{Object.keys(passwordsData).length > 0 && (
 				<PasswordsList
 					data={Object.keys(passwordsData)}
 					renderItem={({ item, _ }) => (
-						<PasswordItem reference={item} onPress={handleViewPassword} />
+						<PasswordItem
+							reference={item}
+							onPress={handleViewPassword}
+							darkMode={settings.darkMode}
+						/>
 					)}
 					keyExtractor={(item, index) => index.toString()}
+					style={{ ...screenStyles.textColor, ...screenStyles.root }}
 				/>
 			)}
 			{Object.keys(passwordsData).length === 0 && (
 				<NoPasswords>
-					<NoPasswordsText style={{ fontFamily: "WorkSans-SemiBold" }}>
+					<NoPasswordsText
+						style={{
+							fontFamily: "WorkSans-SemiBold",
+							...screenStyles.textColor,
+						}}>
 						No passwords saved
 					</NoPasswordsText>
 				</NoPasswords>
@@ -358,70 +464,3 @@ export default () => {
 		</Container>
 	)
 }
-
-const modalStyles = StyleSheet.create({
-	nomargin: {
-		margin: 0,
-		color: "#091e42",
-	},
-	floatLeft: {
-		textAlign: "left",
-		alignSelf: "flex-start",
-		paddingLeft: 10,
-	},
-	root: {
-		flexDirection: "column",
-		justifyContent: "center",
-		alignItems: "center",
-		padding: 10,
-		paddingTop: 20,
-		paddingBottom: 20,
-		backgroundColor: "#f5f5f5", // light gray background
-	},
-	inputContainer: {
-		flexDirection: "row",
-		width: "100%",
-		marginBottom: 10,
-		marginLeft: 0,
-		padding: 10,
-	},
-	input: {
-		backgroundColor: "#f5f5f5",
-		borderColor: "#dfe1e6",
-		color: "#091e42",
-		borderRadius: 3,
-		borderWidth: 2,
-		borderStyle: "solid",
-		fontSize: 14,
-		paddingLeft: 8,
-		paddingRight: 8,
-		paddingTop: 6,
-		paddingBottom: 6,
-		height: 36,
-		marginRight: 5,
-	},
-	buttonContainer: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		width: "100%",
-	},
-	deleteButton: {
-		backgroundColor: "red", // red background
-		padding: 10,
-		borderRadius: 5,
-		width: "45%",
-		alignItems: "center",
-	},
-	okButton: {
-		backgroundColor: "green", // green background
-		padding: 10,
-		borderRadius: 5,
-		width: "45%",
-		alignItems: "center",
-	},
-	buttonText: {
-		color: "white", // white text
-		fontWeight: "bold",
-		fontSize: 16,
-	},
-})

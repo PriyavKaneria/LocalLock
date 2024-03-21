@@ -1,3 +1,5 @@
 {
-	"cSpell.words": ["nomargin", "persistor"]
+	"cSpell.words": ["nomargin", "persistor"],
+	"files.autoSave": "afterDelay",
+	"files.autoSaveDelay": 1000
 }
