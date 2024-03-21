@@ -1,4 +1,3 @@
-import React from "react"
 import { createStackNavigator } from "@react-navigation/stack"
 
 import Splash from "../pages/SplashAuth"
@@ -18,13 +17,13 @@ export default () => {
 				},
 				headerTintColor: settings.darkMode ? "#fbfbfb" : "#1e1e1e",
 			}}>
-			{/* <MainStack.Screen
-			name='Splash'
-			component={Splash}
-			options={{
-				headerShown: false,
-			}}
-		/> */}
+			<MainStack.Screen
+				name='Splash'
+				component={Splash}
+				options={{
+					headerShown: false,
+				}}
+			/>
 			<MainStack.Screen name='List' component={ListScreen} />
 			<MainStack.Screen name='Settings' component={SettingsScreen} />
 		</MainStack.Navigator>

@@ -8,7 +8,7 @@ import {
 } from "./styles"
 import { useNavigation } from "@react-navigation/native"
 import { useDispatch, useSelector } from "react-redux"
-import { useEffect, useLayoutEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
 	Button,
 	StyleSheet,
@@ -149,7 +149,7 @@ export default () => {
 			padding: 10,
 			paddingTop: 20,
 			paddingBottom: 20,
-			backgroundColor: settings.darkMode ? "#171717" : "#f5f5f5", // dark or light gray background
+			backgroundColor: settings.darkMode ? "#1e1e1e" : "#f5f5f5", // dark or light gray background
 		},
 		inputContainer: {
 			flexDirection: "row",
@@ -160,10 +160,10 @@ export default () => {
 	})
 	const screenStyles = StyleSheet.create({
 		root: {
-			backgroundColor: settings.darkMode ? "#171717" : "#f5f5f5", // dark or light gray background
+			backgroundColor: settings.darkMode ? "#252526" : "white", // dark or light gray background
 		},
 		textColor: {
-			color: settings.darkMode ? "white" : "black",
+			color: settings.darkMode ? "#f8f8f8" : "black",
 		},
 		trackColor: {
 			false: "#767577",
@@ -289,6 +289,7 @@ export default () => {
 						}
 						ios_backgroundColor={screenStyles.iosBackgroundColor}
 						onValueChange={() => {
+							setStatusBarStyle(settings.darkMode ? "light" : "dark", true)
 							dispatch({
 								type: "SET_DARK_MODE",
 								payload: !settings.darkMode,

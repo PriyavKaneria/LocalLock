@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import {
 	BackHandler,
 	View,
@@ -75,7 +75,7 @@ export default () => {
 					onPress={() => navigation.navigate("Settings")}>
 					<AddButtonImage
 						source={require("../../assets/settings.png")}
-						style={{ tintColor: settings.darkMode ? "#fbfbfb" : "#000000" }}
+						style={{ tintColor: settings.darkMode ? "#fbfbfb" : "black" }}
 					/>
 				</AddButton>
 			),
@@ -240,13 +240,13 @@ export default () => {
 	const modalStyles = StyleSheet.create({
 		nomargin: {
 			margin: 0,
-			color: settings.darkMode ? "#e8e8e8" : "black",
+			color: settings.darkMode ? "white" : "black",
 		},
 		floatLeft: {
 			textAlign: "left",
 			alignSelf: "flex-start",
 			paddingLeft: 10,
-			color: settings.darkMode ? "#0f2b23" : "black",
+			color: settings.darkMode ? "#9e9e9e" : "black",
 		},
 		root: {
 			flexDirection: "column",
@@ -255,8 +255,10 @@ export default () => {
 			padding: 10,
 			paddingTop: 20,
 			paddingBottom: 20,
-			backgroundColor: settings.darkMode ? "#3d8a74" : "#f5f5f5",
+			backgroundColor: settings.darkMode ? "#1e1e1e" : "#f5f5f5",
 			color: settings.darkMode ? "#e8e8e8" : "#091e42",
+			borderColor: settings.darkMode ? "#616161" : "black",
+			borderWidth: 1,
 		},
 		inputContainer: {
 			flexDirection: "row",
@@ -266,9 +268,9 @@ export default () => {
 			padding: 10,
 		},
 		input: {
-			backgroundColor: settings.darkMode ? "#184d3e" : "#f5f5f5",
-			borderColor: settings.darkMode ? "#545454" : "#dfe1e6",
-			color: settings.darkMode ? "#e4e4e4" : "#091e42",
+			backgroundColor: settings.darkMode ? "#1e1e1e" : "#f5f5f5",
+			borderColor: settings.darkMode ? "#4a4a4a" : "#dfe1e6",
+			color: settings.darkMode ? "#dedede" : "#091e42",
 			borderRadius: 3,
 			borderWidth: 2,
 			borderStyle: "solid",
@@ -288,18 +290,20 @@ export default () => {
 			paddingRight: 10,
 		},
 		deleteButton: {
-			backgroundColor: settings.darkMode ? "#eb5746" : "red", // red background
+			backgroundColor: settings.darkMode ? "#CC0000" : "#ff4444", // red background
 			padding: 10,
 			borderRadius: 5,
 			width: "45%",
 			alignItems: "center",
+			color: "white",
 		},
 		okButton: {
-			backgroundColor: settings.darkMode ? "#5cedc4" : "green", // green background
+			backgroundColor: settings.darkMode ? "#007E33" : "#00C851", // green background
 			padding: 10,
 			borderRadius: 5,
 			width: "45%",
 			alignItems: "center",
+			color: "white",
 		},
 		buttonText: {
 			color: settings.darkMode ? "black" : "white",
@@ -310,13 +314,13 @@ export default () => {
 
 	const screenStyles = StyleSheet.create({
 		root: {
-			backgroundColor: settings.darkMode ? "#252526" : "#ffffff",
+			backgroundColor: settings.darkMode ? "#252526" : "white",
 		},
 		textColor: {
 			color: settings.darkMode ? "#e8e8e8" : "black",
 		},
 		image: {
-			tintColor: settings.darkMode ? "#1e1e1e" : "black",
+			tintColor: settings.darkMode ? "#e8e8e8" : "black",
 		},
 	})
 
@@ -353,7 +357,7 @@ export default () => {
 							onChangeText={(text) => setReference(text)}
 							value={reference}
 							placeholder='Enter reference text'
-							placeholderTextColor={settings.darkMode ? "#9dcfaf" : "#a3a3a3"}
+							placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
 						/>
 						{!addPasswordMode && (
 							<TouchableOpacity onPress={toggleReferenceEditMode}>
@@ -399,7 +403,7 @@ export default () => {
 								onChangeText={(text) => setPassword(text)}
 								value={password}
 								placeholder='Enter password'
-								placeholderTextColor={settings.darkMode ? "#9dcfaf" : "#a3a3a3"}
+								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
 								secureTextEntry={!editPasswordMode && !passwordVisible}
 							/>
 						</TouchableOpacity>

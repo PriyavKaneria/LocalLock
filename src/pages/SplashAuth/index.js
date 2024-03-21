@@ -14,12 +14,10 @@ import {
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import * as LocalAuthentication from "expo-local-authentication"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import * as Crypto from "expo-crypto"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import * as SecureStore from "expo-secure-store"
-
-const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
 export default () => {
 	const [facialRecognitionAvailable, setFacialRecognitionAvailable] =
@@ -220,7 +218,50 @@ export default () => {
 		return <AppLoading />
 	}
 
-	styles.main.backgroundColor = settings.darkMode ? "#171717" : "#f5f5f5"
+	const styles = StyleSheet.create({
+		main: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center",
+			backgroundColor: settings.darkMode ? "#252526" : "white",
+		},
+		animation: {
+			width: 400,
+			height: 400,
+		},
+		biometricsButton: {
+			marginTop: 20,
+		},
+		inputContainer: {
+			marginBottom: 20,
+		},
+		inputLabel: {
+			fontFamily: "WorkSans-SemiBold",
+			fontSize: 20,
+			marginBottom: 10,
+			color: settings.darkMode ? "#fbfbfb" : "#000000",
+		},
+		input: {
+			fontFamily: "WorkSans-Regular",
+			fontSize: 20,
+			padding: 10,
+			borderWidth: 1,
+			borderColor: settings.darkMode ? "#fbfbfb" : "#000000",
+			borderRadius: 5,
+			width: 200,
+		},
+		buttonText: {
+			fontFamily: "WorkSans-SemiBold",
+			fontSize: 20,
+			padding: 10,
+			borderWidth: 1,
+			borderColor: settings.darkMode ? "#fbfbfb" : "#000000",
+			borderRadius: 5,
+			width: 200,
+			textAlign: "center",
+			color: settings.darkMode ? "#fbfbfb" : "#000000",
+		},
+	})
 
 	return (
 		<View style={styles.main}>
@@ -240,7 +281,10 @@ export default () => {
 						borderColor: "gray",
 					}}
 					cellStyleFocused={{
-						borderColor: "black",
+						borderColor: settings.darkMode ? "white" : "black",
+					}}
+					textStyleFocused={{
+						color: settings.darkMode ? "white" : "black",
 					}}
 					value={pin}
 					password
@@ -256,46 +300,3 @@ export default () => {
 		</View>
 	)
 }
-
-const styles = StyleSheet.create({
-	main: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#f5f5f5",
-	},
-	animation: {
-		width: 400,
-		height: 400,
-	},
-	biometricsButton: {
-		marginTop: 20,
-	},
-	inputContainer: {
-		marginBottom: 20,
-	},
-	inputLabel: {
-		fontFamily: "WorkSans-SemiBold",
-		fontSize: 20,
-		marginBottom: 10,
-	},
-	input: {
-		fontFamily: "WorkSans-Regular",
-		fontSize: 20,
-		padding: 10,
-		borderWidth: 1,
-		borderColor: "#000000",
-		borderRadius: 5,
-		width: 200,
-	},
-	buttonText: {
-		fontFamily: "WorkSans-SemiBold",
-		fontSize: 20,
-		padding: 10,
-		borderWidth: 1,
-		borderColor: "#000000",
-		borderRadius: 5,
-		width: 200,
-		textAlign: "center",
-	},
-})
