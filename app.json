@@ -1,43 +1,50 @@
 {
-  "expo": {
-    "name": "Local Lock",
-    "slug": "locallock",
-    "version": "0.4.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "fill",
-      "backgroundColor": "#F8FAFC"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F8FAFC"
-      },
-      "package": "com.diginova.locallock",
-      "versionCode": 4,
-      "permissions": [
-        "USE_BIOMETRIC"
-      ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "a4920cd8-845d-43dc-a4c0-072323f5698d"
-      }
-    },
-    "owner": "diginova"
-  }
+	"expo": {
+		"name": "Local Lock",
+		"slug": "locallock",
+		"version": "0.5.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "fill",
+			"backgroundColor": "#F8FAFC"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#F8FAFC"
+			},
+			"package": "com.diginova.locallock",
+			"versionCode": 5,
+			"permissions": ["USE_BIOMETRIC"]
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"extra": {
+			"eas": {
+				"projectId": "a4920cd8-845d-43dc-a4c0-072323f5698d"
+			}
+		},
+		"owner": "diginova",
+		"plugins": [
+			[
+				"expo-build-properties",
+				{
+					"android": {
+						"enableProguardInReleaseBuilds": true,
+						"allowBackup": false
+					}
+				}
+			]
+		]
+	}
 }

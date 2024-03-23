@@ -1,0 +1,3 @@
+* Added darkmode support for the app
+
+* Changed app icon backgrond to transparent
