@@ -38,6 +38,13 @@ export default (state = initialState, action) => {
 			}
 			newState.darkMode = action.payload
 			break
+
+		case "SET_STATE_SETTINGS":
+			newState = action.payload.settings
+			break
+
+		default:
+			return state
 	}
 
 	return {
