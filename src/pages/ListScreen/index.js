@@ -9,6 +9,8 @@ import {
 	ToastAndroid,
 	Alert,
 	AppState,
+	ScrollView,
+	SafeAreaView,
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useDispatch, useSelector } from "react-redux"
@@ -36,6 +38,7 @@ import AddPasswordButton from "../../components/AddPasswordButton"
 export default () => {
 	const navigation = useNavigation()
 	const passwordsData = useSelector((state) => state.passwords.passwords)
+	const notesData = useSelector((state) => state.passwords.notes)
 	const settings = useSelector((state) => state.settings.settings)
 	const dispatch = useDispatch()
 	const [modalVisible, setModalVisible] = useState(false)
@@ -43,10 +46,12 @@ export default () => {
 	const [addPasswordMode, setAddPasswordMode] = useState(false)
 	const [editReferenceMode, setEditReferenceMode] = useState(false)
 	const [editPasswordMode, setEditPasswordMode] = useState(false)
+	const [editNoteMode, setEditNoteMode] = useState(false)
 	const [reference, setReference] = useState("")
 	const [old_reference, setOldReference] = useState("")
 	const [password, setPassword] = useState("")
 	const [passwordVisible, setPasswordVisible] = useState(false)
+	const [note, setNote] = useState("")
 
 	const toggleReferenceEditMode = () => {
 		setEditReferenceMode(!editReferenceMode)
@@ -54,6 +59,10 @@ export default () => {
 
 	const togglePasswordEditMode = () => {
 		setEditPasswordMode(!editPasswordMode)
+	}
+
+	const toggleNoteEditMode = () => {
+		setEditNoteMode(!editNoteMode)
 	}
 
 	useEffect(() => {
@@ -101,7 +110,7 @@ export default () => {
 		}
 	}, [navigation])
 
-	const handleViewPassword = async (_reference) => {
+	const handleViewReferenceModal = async (_reference) => {
 		setReference(_reference)
 		setOldReference(_reference)
 		const pinHash = await SecureStore.getItemAsync("pinHash")
@@ -118,23 +127,37 @@ export default () => {
 			pinHash
 		).toString(CryptoJS.enc.Utf8)
 		setPassword(decryptedPassword)
+		if (!notesData[_reference]) {
+			dispatch({
+				type: "INITIALIZE_NOTE",
+				payload: {
+					reference: _reference,
+				},
+			})
+		}
+		setNote(notesData[_reference] ?? "")
 		setModalVisible(true)
+	}
+
+	const setAllFieldsEditMode = (mode) => {
+		setEditReferenceMode(mode)
+		setEditPasswordMode(mode)
+		setEditNoteMode(mode)
 	}
 
 	const handleAddPassword = () => {
 		setAddPasswordMode(true)
 		setReference("")
 		setPassword("")
-		setEditReferenceMode(true)
-		setEditPasswordMode(true)
+		setNote("")
+		setAllFieldsEditMode(true)
 		setModalVisible(true)
 	}
 
 	const handleDeleteButton = () => {
 		if (addPasswordMode || editReferenceMode || editPasswordMode) {
 			setAddPasswordMode(false)
-			setEditReferenceMode(false)
-			setEditPasswordMode(false)
+			setAllFieldsEditMode(false)
 			setModalVisible(false)
 			return
 		}
@@ -145,8 +168,7 @@ export default () => {
 				{
 					text: "Cancel",
 					onPress: () => {
-						setEditReferenceMode(false)
-						setEditPasswordMode(false)
+						setAllFieldsEditMode(false)
 						setAddPasswordMode(false)
 						setModalVisible(false)
 					},
@@ -161,8 +183,7 @@ export default () => {
 								reference,
 							},
 						})
-						setEditReferenceMode(false)
-						setEditPasswordMode(false)
+						setAllFieldsEditMode(false)
 						setAddPasswordMode(false)
 						setModalVisible(false)
 					},
@@ -175,6 +196,7 @@ export default () => {
 	const handleOkSave = async () => {
 		const trimmedReference = reference.trim()
 		const trimmedPassword = password.trim()
+		const trimmedNote = note.trim()
 		if (trimmedReference === "" || trimmedPassword === "") {
 			ToastAndroid.show(
 				"Reference and password cannot be empty",
@@ -209,9 +231,17 @@ export default () => {
 				payload: {
 					reference: trimmedReference,
 					password: encryptedPassword,
+					note: trimmedNote,
 				},
 			})
-		} else if (editReferenceMode || editPasswordMode) {
+		} else if (editReferenceMode || editPasswordMode || editNoteMode) {
+			if (Object.keys(passwordsData).includes(trimmedReference)) {
+				ToastAndroid.show(
+					"Reference with given name already exists",
+					ToastAndroid.SHORT
+				)
+				return
+			}
 			// save password
 			dispatch({
 				type: "EDIT_PASSWORD",
@@ -219,11 +249,11 @@ export default () => {
 					reference: trimmedReference,
 					password: encryptedPassword,
 					old_reference,
+					note: trimmedNote,
 				},
 			})
 		}
-		setEditReferenceMode(false)
-		setEditPasswordMode(false)
+		setAllFieldsEditMode(false)
 		setAddPasswordMode(false)
 		setModalVisible(false)
 	}
@@ -274,13 +304,41 @@ export default () => {
 			borderRadius: 3,
 			borderWidth: 2,
 			borderStyle: "solid",
-			fontSize: 20,
 			paddingLeft: 8,
 			paddingRight: 8,
 			paddingTop: 6,
 			paddingBottom: 6,
 			height: 36,
 			marginRight: 5,
+		},
+		textarea: {
+			backgroundColor: settings.darkMode ? "#1e1e1e" : "#f5f5f5",
+			borderColor: settings.darkMode ? "#4a4a4a" : "#dfe1e6",
+			color: settings.darkMode ? "#dedede" : "#091e42",
+			borderRadius: 3,
+			borderWidth: 2,
+			borderStyle: "solid",
+			paddingLeft: 8,
+			paddingRight: 8,
+			paddingTop: 6,
+			paddingBottom: 6,
+			height: 150,
+			marginRight: 5,
+			textAlignVertical: "top",
+		},
+		textareaDisabled: {
+			backgroundColor: settings.darkMode ? "#1e1e1e" : "#f5f5f5",
+			borderColor: settings.darkMode ? "#4a4a4a" : "#dfe1e6",
+			color: settings.darkMode ? "#dedede" : "#091e42",
+			borderRadius: 3,
+			borderWidth: 2,
+			borderStyle: "solid",
+			paddingLeft: 8,
+			paddingRight: 8,
+			paddingTop: 6,
+			paddingBottom: 6,
+			marginRight: 5,
+			textAlignVertical: "top",
 		},
 		buttonContainer: {
 			flexDirection: "row",
@@ -331,21 +389,23 @@ export default () => {
 				animationOut={"zoomOut"}
 				isVisible={modalVisible}
 				onRequestClose={() => {
-					setEditReferenceMode(false)
-					setEditPasswordMode(false)
+					setAllFieldsEditMode(false)
 					setAddPasswordMode(false)
 					setModalVisible(false)
 				}}
 				style={{ margin: 0, marginLeft: 20, marginRight: 20 }}
 				onBackdropPress={() => {
-					setEditReferenceMode(false)
-					setEditPasswordMode(false)
+					setAllFieldsEditMode(false)
 					setAddPasswordMode(false)
 					setModalVisible(false)
 				}}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>
-						{editReferenceMode ? "Edit reference" : "Reference"}
+						{addPasswordMode
+							? "Add unique Reference"
+							: editReferenceMode
+							? "Edit reference"
+							: "Reference"}
 					</Text>
 					<View style={modalStyles.inputContainer}>
 						<TextInput
@@ -371,7 +431,9 @@ export default () => {
 						)}
 					</View>
 					<Text style={modalStyles.floatLeft}>
-						{editPasswordMode
+						{addPasswordMode
+							? "Add Password"
+							: editPasswordMode
 							? "Edit password"
 							: settings.longPressToCopy
 							? "Password (tap & hold to see, long press to copy)"
@@ -418,6 +480,49 @@ export default () => {
 							</TouchableOpacity>
 						)}
 					</View>
+					<Text style={modalStyles.floatLeft}>
+						{addPasswordMode
+							? "Add Notes"
+							: editNoteMode
+							? "Edit notes"
+							: "Notes"}
+					</Text>
+					<View style={modalStyles.inputContainer}>
+						{editNoteMode && (
+							<TextInput
+								style={{
+									...modalStyles.textarea,
+									width: addPasswordMode || editNoteMode ? "100%" : "90%",
+								}}
+								editable={editNoteMode}
+								onChangeText={(text) => setNote(text)}
+								value={note}
+								multiline={true}
+								placeholder='Enter notes...'
+								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
+							/>
+						)}
+						{!editNoteMode && (
+							<View style={{ flex: 1, flexGrow: 1, ...modalStyles.textarea }}>
+								<ScrollView
+									contentContainerStyle={{
+										flexGrow: 1,
+									}}>
+									<Text>{note}</Text>
+								</ScrollView>
+							</View>
+						)}
+						{!addPasswordMode && (
+							<TouchableOpacity onPress={toggleNoteEditMode}>
+								{!editNoteMode && (
+									<ModalButtonImage
+										source={require("../../assets/edit.png")}
+										style={screenStyles.image}
+									/>
+								)}
+							</TouchableOpacity>
+						)}
+					</View>
 					<View style={modalStyles.buttonContainer}>
 						<TouchableOpacity
 							style={modalStyles.deleteButton}
@@ -446,7 +551,7 @@ export default () => {
 					renderItem={({ item, _ }) => (
 						<PasswordItem
 							reference={item}
-							onPress={handleViewPassword}
+							onPress={handleViewReferenceModal}
 							darkMode={settings.darkMode}
 						/>
 					)}
