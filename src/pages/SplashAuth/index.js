@@ -17,7 +17,7 @@ import * as LocalAuthentication from "expo-local-authentication"
 import { useSelector } from "react-redux"
 import * as Crypto from "expo-crypto"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import * as SecureStore from "expo-secure-store"
+import { getSecureStoreItemAsync, setSecureStoreItemAsync } from "../../utils/secure_store"
 
 export default () => {
 	const [facialRecognitionAvailable, setFacialRecognitionAvailable] =
@@ -69,7 +69,7 @@ export default () => {
 					"Biometric authentication successful",
 					ToastAndroid.SHORT
 				)
-				const pinHash = await SecureStore.getItemAsync("pinHash")
+				const pinHash = await getSecureStoreItemAsync("pinHash")
 				if (!pinHash) {
 					ToastAndroid.show(
 						"Please set a PIN for future use",
@@ -100,7 +100,7 @@ export default () => {
 				results.error === "app_cancel"
 			) {
 				// Allow user to use PIN instead
-				const pinHash = await SecureStore.getItemAsync("pinHash")
+				const pinHash = await getSecureStoreItemAsync("pinHash")
 				if (!pinHash) {
 					ToastAndroid.show(
 						"Biometric authentication to set new PIN is required",
@@ -153,7 +153,7 @@ export default () => {
 
 	useEffect(() => {
 		async function checkPin() {
-			const pinHash = await SecureStore.getItemAsync("pinHash")
+			const pinHash = await getSecureStoreItemAsync("pinHash")
 			if (pinHash) {
 				setIsPinSet(true)
 			}
@@ -169,7 +169,7 @@ export default () => {
 				text
 			)
 			setPin("")
-			const pinHash = await SecureStore.getItemAsync("pinHash")
+			const pinHash = await getSecureStoreItemAsync("pinHash")
 			if (!pinHash) {
 				Alert.alert("Set PIN", "Would you like to set this PIN?", [
 					{
@@ -182,7 +182,7 @@ export default () => {
 					{
 						text: "Yes",
 						onPress: async () => {
-							await SecureStore.setItemAsync("pinHash", inputPinHash)
+							await setSecureStoreItemAsync("pinHash", inputPinHash)
 							navigation.navigate("List")
 						},
 					},

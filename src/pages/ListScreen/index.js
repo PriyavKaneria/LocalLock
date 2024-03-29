@@ -20,7 +20,6 @@ import * as Clipboard from "expo-clipboard"
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import CryptoJS from "react-native-crypto-js"
-import * as SecureStore from "expo-secure-store"
 
 import {
 	Container,
@@ -34,6 +33,7 @@ import {
 
 import PasswordItem from "../../components/PasswordItem"
 import AddPasswordButton from "../../components/AddPasswordButton"
+import { getSecureStoreItemAsync } from "../../utils/secure_store"
 
 export default () => {
 	const navigation = useNavigation()
@@ -113,7 +113,7 @@ export default () => {
 	const handleViewReferenceModal = async (_reference) => {
 		setReference(_reference)
 		setOldReference(_reference)
-		const pinHash = await SecureStore.getItemAsync("pinHash")
+		const pinHash = await getSecureStoreItemAsync("pinHash")
 		if (!pinHash) {
 			ToastAndroid.show(
 				"PIN not set. Please set a PIN to view passwords",
@@ -204,7 +204,7 @@ export default () => {
 			)
 			return
 		}
-		const pinHash = await SecureStore.getItemAsync("pinHash")
+		const pinHash = await getSecureStoreItemAsync("pinHash")
 		if (!pinHash) {
 			ToastAndroid.show(
 				"PIN not set. Please set a PIN to save passwords",
@@ -235,7 +235,11 @@ export default () => {
 				},
 			})
 		} else if (editReferenceMode || editPasswordMode || editNoteMode) {
-			if (Object.keys(passwordsData).includes(trimmedReference)) {
+			if (
+				editReferenceMode &&
+				old_reference !== trimmedReference &&
+				Object.keys(passwordsData).includes(trimmedReference)
+			) {
 				ToastAndroid.show(
 					"Reference with given name already exists",
 					ToastAndroid.SHORT
@@ -547,7 +551,7 @@ export default () => {
 			/>
 			{Object.keys(passwordsData).length > 0 && (
 				<PasswordsList
-					data={Object.keys(passwordsData)}
+					data={Object.keys(passwordsData).reverse()}
 					renderItem={({ item, _ }) => (
 						<PasswordItem
 							reference={item}
