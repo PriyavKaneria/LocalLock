@@ -22,8 +22,8 @@ Playstore link - https://play.google.com/store/apps/details?id=com.diginova.loca
 ## Upcoming features
 
 - [x] Dark mode
+- [x] Additional fields to store notes
 - [ ] QR code based device to device offline sync
-- [ ] Additional fields to store links and documents
 - [ ] Encrypted export for backup and restore via import
 
 ## Screenshots

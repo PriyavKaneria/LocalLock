@@ -2,12 +2,12 @@
 	"expo": {
 		"name": "Local Lock",
 		"slug": "locallock",
-		"version": "0.5.0",
+		"version": "0.6.1",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"splash": {
 			"image": "./assets/splash.png",
-			"resizeMode": "fill",
+			"resizeMode": "cover",
 			"backgroundColor": "#F8FAFC"
 		},
 		"updates": {
@@ -23,8 +23,15 @@
 				"backgroundColor": "#F8FAFC"
 			},
 			"package": "com.diginova.locallock",
-			"versionCode": 5,
-			"permissions": ["USE_BIOMETRIC"]
+			"versionCode": 7,
+			"permissions": ["USE_BIOMETRIC"],
+			"blockedPermissions": [
+				"READ_EXTERNAL_STORAGE",
+				"WRITE_EXTERNAL_STORAGE",
+				"INTERNET",
+				"SYSTEM_ALERT_WINDOW",
+				"VIBRATE"
+			]
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
