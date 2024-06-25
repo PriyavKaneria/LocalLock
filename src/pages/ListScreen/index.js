@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import {
 	BackHandler,
 	View,
@@ -10,7 +10,6 @@ import {
 	Alert,
 	AppState,
 	ScrollView,
-	SafeAreaView,
 	Button,
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -35,14 +34,7 @@ import {
 import PasswordItem from "../../components/PasswordItem"
 import AddPasswordButton from "../../components/AddPasswordButton"
 import { getSecureStoreItemAsync } from "../../utils/secure_store"
-import {
-	AttachStep,
-	SpotlightTourProvider,
-	flip,
-	offset,
-	shift,
-	useSpotlightTour,
-} from "react-native-spotlight-tour"
+import { TourGuideZone, useTourGuideController } from "rn-tourguide"
 
 export default () => {
 	const navigation = useNavigation()
@@ -147,6 +139,10 @@ export default () => {
 		}
 		setNote(notesData[_reference] ?? "")
 		setModalVisible(true)
+		// check if tutorial is to be shown
+		setTimeout(() => {
+			start("modal")
+		}, 1000)
 	}
 
 	const setAllFieldsEditMode = (mode) => {
@@ -277,10 +273,6 @@ export default () => {
 		"WorkSans-Regular": require("../../../assets/fonts/WorkSans/WorkSans-Regular.ttf"),
 	})
 
-	if (!fontsLoaded) {
-		return <AppLoading />
-	}
-
 	const modalStyles = StyleSheet.create({
 		nomargin: {
 			margin: 0,
@@ -384,51 +376,6 @@ export default () => {
 		},
 	})
 
-	const renderTourBox = (text, stopInsteadOfNext = false) => {
-		const { stop, next } = useSpotlightTour()
-
-		return (
-			<View>
-				<Text
-					style={{
-						fontSize: 20,
-						color: "white",
-					}}>
-					{text}
-				</Text>
-				<Button
-					title='Ok'
-					onPress={() => (stopInsteadOfNext ? stop() : next())}
-				/>
-			</View>
-		)
-	}
-
-	const tourSteps = [
-		{
-			render: () => renderTourBox("Click here to add a new password"),
-		},
-		{
-			render: () =>
-				renderTourBox(
-					"Your passwords will be listed here with last updated first",
-					true
-				),
-		},
-		{
-			render: () => renderTourBox("Add a unique reference for identification"),
-		},
-		{
-			render: () => renderTourBox("Add the password here"),
-		},
-		{
-			render: () => renderTourBox("Optionally add notes here"),
-		},
-		{
-			render: () => renderTourBox("Click here to save the password", true),
-		},
-	]
-
 	const screenStyles = StyleSheet.create({
 		root: {
 			backgroundColor: settings.darkMode ? "#252526" : "white",
@@ -441,245 +388,261 @@ export default () => {
 		},
 	})
 
-	const { goTo } = useSpotlightTour()
+	const {
+		canStart, // a boolean indicate if you can start tour guide
+		start, // a function to start the tourguide
+		stop, // a function  to stopping it
+		eventEmitter, // an object for listening some events
+		tourKey, // a string to identify the tourguide
+	} = useTourGuideController("home")
 
+	const {
+		canStart: canStartModal, // a boolean indicate if you can start tour guide
+		start: startModal, // a function to start the tourguide
+		stop: stopModal, // a function  to stopping it
+		eventEmitter: eventEmitterModal, // an object for listening some events
+		tourKey: tourKeyModal, // a string to identify the tourguide
+	} = useTourGuideController("modal")
+
+	useEffect(() => {
+		if (canStart) {
+			// 👈 test if you can start otherwise nothing will happen
+			start()
+		}
+	}, [canStart])
+
+	if (!fontsLoaded) {
+		return <AppLoading />
+	}
 	return (
-		<SpotlightTourProvider
-			steps={tourSteps}
-			overlayColor={"gray"}
-			shape='rectangle'
-			motion='fade'
-			nativeDriver={true}
-			overlayOpacity={0.56}
-			// This configurations will apply to all steps
-			floatingProps={{
-				middleware: [offset(5), shift(), flip()],
-				placement: "bottom",
-			}}>
-			{({ start }) => (
-				<Container style={screenStyles.root}>
-					<Modal
-						animationIn={"zoomIn"}
-						animationOut={"zoomOut"}
-						isVisible={modalVisible}
-						onRequestClose={() => {
-							setAllFieldsEditMode(false)
-							setAddPasswordMode(false)
-							setModalVisible(false)
-						}}
-						style={{ margin: 0, marginLeft: 20, marginRight: 20 }}
-						onBackdropPress={() => {
-							setAllFieldsEditMode(false)
-							setAddPasswordMode(false)
-							setModalVisible(false)
-						}}>
-						<View style={modalStyles.root}>
-							<Text
-								style={modalStyles.floatLeft}
-								onLayout={() => {
-									start()
-									goTo(2)
-								}}>
-								{addPasswordMode
-									? "Add unique Reference"
-									: editReferenceMode
-									? "Edit reference"
-									: "Reference"}
-							</Text>
-							<AttachStep index={2} fill={true}>
-								<View style={modalStyles.inputContainer} id='step2'>
-									<TextInput
-										style={{
-											...modalStyles.input,
-											width:
-												addPasswordMode || editReferenceMode ? "100%" : "90%",
-										}}
-										editable={editReferenceMode}
-										onChangeText={(text) => setReference(text)}
-										value={reference}
-										placeholder='Enter reference text'
-										placeholderTextColor={
-											settings.darkMode ? "#828282" : "#a3a3a3"
-										}
-									/>
-									{!addPasswordMode && (
-										<TouchableOpacity onPress={toggleReferenceEditMode}>
-											{!editReferenceMode && (
-												<ModalButtonImage
-													source={require("../../assets/edit.png")}
-													style={screenStyles.image}
-												/>
-											)}
-										</TouchableOpacity>
-									)}
-								</View>
-							</AttachStep>
-							<Text style={modalStyles.floatLeft}>
-								{addPasswordMode
-									? "Add Password"
-									: editPasswordMode
-									? "Edit password"
-									: settings.longPressToCopy
-									? "Password (tap & hold to see, long press to copy)"
-									: "Password (tap and hold to see)"}
-							</Text>
-							<AttachStep index={3} fill={true}>
-								<View style={modalStyles.inputContainer} id='step3'>
-									<TouchableOpacity
-										onPressIn={() => setPasswordVisible(true)}
-										onPressOut={() => setPasswordVisible(false)}
-										onLongPress={() => {
-											if (!editPasswordMode && settings.longPressToCopy) {
-												// copy password to clipboard
-												Clipboard.setStringAsync(password).then(() => {
-													ToastAndroid.show(
-														"Password copied to clipboard",
-														ToastAndroid.SHORT
-													)
-												})
-											}
-										}}
-										activeOpacity={1}
-										style={{
-											...modalStyles.input,
-											width:
-												addPasswordMode || editPasswordMode ? "100%" : "90%",
-										}}>
-										<TextInput
-											style={modalStyles.nomargin}
-											editable={editPasswordMode}
-											onChangeText={(text) => setPassword(text)}
-											value={password}
-											placeholder='Enter password'
-											placeholderTextColor={
-												settings.darkMode ? "#828282" : "#a3a3a3"
-											}
-											secureTextEntry={!editPasswordMode && !passwordVisible}
-										/>
-									</TouchableOpacity>
-									{!addPasswordMode && (
-										<TouchableOpacity onPress={togglePasswordEditMode}>
-											{!editPasswordMode && (
-												<ModalButtonImage
-													source={require("../../assets/edit.png")}
-													style={screenStyles.image}
-												/>
-											)}
-										</TouchableOpacity>
-									)}
-								</View>
-							</AttachStep>
-							<Text style={modalStyles.floatLeft}>
-								{addPasswordMode
-									? "Add Notes"
-									: editNoteMode
-									? "Edit notes"
-									: "Notes"}
-							</Text>
-							<AttachStep index={4} fill={true}>
-								<View style={modalStyles.inputContainer} id='step4'>
-									{editNoteMode && (
-										<TextInput
-											style={{
-												...modalStyles.textarea,
-												width: addPasswordMode || editNoteMode ? "100%" : "90%",
-											}}
-											editable={editNoteMode}
-											onChangeText={(text) => setNote(text)}
-											value={note}
-											multiline={true}
-											placeholder='Enter notes...'
-											placeholderTextColor={
-												settings.darkMode ? "#828282" : "#a3a3a3"
-											}
+		<Container style={screenStyles.root}>
+			<Modal
+				animationIn={"zoomIn"}
+				animationOut={"zoomOut"}
+				isVisible={modalVisible}
+				onRequestClose={() => {
+					setAllFieldsEditMode(false)
+					setAddPasswordMode(false)
+					setModalVisible(false)
+				}}
+				style={{ margin: 0, marginLeft: 20, marginRight: 20 }}
+				onBackdropPress={() => {
+					setAllFieldsEditMode(false)
+					setAddPasswordMode(false)
+					setModalVisible(false)
+				}}>
+				<View style={modalStyles.root}>
+					<Text style={modalStyles.floatLeft}>
+						{addPasswordMode
+							? "Add unique Reference"
+							: editReferenceMode
+							? "Edit reference"
+							: "Reference"}
+					</Text>
+					<TourGuideZone
+						zone={0}
+						tourKey={tourKeyModal}
+						text='Add a unique reference for identification'>
+						<View style={modalStyles.inputContainer} id='step2'>
+							<TextInput
+								style={{
+									...modalStyles.input,
+									width: addPasswordMode || editReferenceMode ? "100%" : "90%",
+								}}
+								editable={editReferenceMode}
+								onChangeText={(text) => setReference(text)}
+								value={reference}
+								placeholder='Enter reference text'
+								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
+							/>
+							{!addPasswordMode && (
+								<TouchableOpacity onPress={toggleReferenceEditMode}>
+									{!editReferenceMode && (
+										<ModalButtonImage
+											source={require("../../assets/edit.png")}
+											style={screenStyles.image}
 										/>
 									)}
-									{!editNoteMode && (
-										<View
-											style={{
-												flex: 1,
-												flexGrow: 1,
-												...modalStyles.textarea,
-											}}>
-											<ScrollView
-												contentContainerStyle={{
-													flexGrow: 1,
-												}}>
-												<Text>{note}</Text>
-											</ScrollView>
-										</View>
-									)}
-									{!addPasswordMode && (
-										<TouchableOpacity onPress={toggleNoteEditMode}>
-											{!editNoteMode && (
-												<ModalButtonImage
-													source={require("../../assets/edit.png")}
-													style={screenStyles.image}
-												/>
-											)}
-										</TouchableOpacity>
-									)}
-								</View>
-							</AttachStep>
-							<View style={modalStyles.buttonContainer}>
-								<TouchableOpacity
-									style={modalStyles.deleteButton}
-									onPress={handleDeleteButton}>
-									<Text style={modalStyles.buttonText}>
-										{editReferenceMode || editPasswordMode
-											? "Cancel"
-											: "Delete"}
-									</Text>
 								</TouchableOpacity>
-								<AttachStep index={5} fill={true}>
-									<TouchableOpacity
-										style={modalStyles.okButton}
-										id='step5'
-										onPress={handleOkSave}>
-										<Text style={modalStyles.buttonText}>
-											{editReferenceMode || editPasswordMode ? "Save" : "Ok"}
-										</Text>
-									</TouchableOpacity>
-								</AttachStep>
-							</View>
+							)}
 						</View>
-					</Modal>
-					<AttachStep index={0} fill={true}>
-						<AddPasswordButton
-							onPress={handleAddPassword}
-							darkMode={settings.darkMode}
-						/>
-					</AttachStep>
-					<Button onPress={start} title='Tour' />
-					{Object.keys(passwordsData).length > 0 && (
-						<PasswordsList
-							data={Object.keys(passwordsData).reverse()}
-							renderItem={({ item, _ }) => (
-								<PasswordItem
-									reference={item}
-									onPress={handleViewReferenceModal}
-									darkMode={settings.darkMode}
+					</TourGuideZone>
+					<Text style={modalStyles.floatLeft}>
+						{addPasswordMode
+							? "Add Password"
+							: editPasswordMode
+							? "Edit password"
+							: settings.longPressToCopy
+							? "Password (tap & hold to see, long press to copy)"
+							: "Password (tap and hold to see)"}
+					</Text>
+					<TourGuideZone
+						zone={1}
+						tourKey={tourKeyModal}
+						text='Add the password here'>
+						<View style={modalStyles.inputContainer} id='step3'>
+							<TouchableOpacity
+								onPressIn={() => setPasswordVisible(true)}
+								onPressOut={() => setPasswordVisible(false)}
+								onLongPress={() => {
+									if (!editPasswordMode && settings.longPressToCopy) {
+										// copy password to clipboard
+										Clipboard.setStringAsync(password).then(() => {
+											ToastAndroid.show(
+												"Password copied to clipboard",
+												ToastAndroid.SHORT
+											)
+										})
+									}
+								}}
+								activeOpacity={1}
+								style={{
+									...modalStyles.input,
+									width: addPasswordMode || editPasswordMode ? "100%" : "90%",
+								}}>
+								<TextInput
+									style={modalStyles.nomargin}
+									editable={editPasswordMode}
+									onChangeText={(text) => setPassword(text)}
+									value={password}
+									placeholder='Enter password'
+									placeholderTextColor={
+										settings.darkMode ? "#828282" : "#a3a3a3"
+									}
+									secureTextEntry={!editPasswordMode && !passwordVisible}
+								/>
+							</TouchableOpacity>
+							{!addPasswordMode && (
+								<TouchableOpacity onPress={togglePasswordEditMode}>
+									{!editPasswordMode && (
+										<ModalButtonImage
+											source={require("../../assets/edit.png")}
+											style={screenStyles.image}
+										/>
+									)}
+								</TouchableOpacity>
+							)}
+						</View>
+					</TourGuideZone>
+					<Text style={modalStyles.floatLeft}>
+						{addPasswordMode
+							? "Add Notes"
+							: editNoteMode
+							? "Edit notes"
+							: "Notes"}
+					</Text>
+					<TourGuideZone
+						zone={2}
+						tourKey={tourKeyModal}
+						text='Optionally add notes here'>
+						<View style={modalStyles.inputContainer} id='step4'>
+							{editNoteMode && (
+								<TextInput
+									style={{
+										...modalStyles.textarea,
+										width: addPasswordMode || editNoteMode ? "100%" : "90%",
+									}}
+									editable={editNoteMode}
+									onChangeText={(text) => setNote(text)}
+									value={note}
+									multiline={true}
+									placeholder='Enter notes...'
+									placeholderTextColor={
+										settings.darkMode ? "#828282" : "#a3a3a3"
+									}
 								/>
 							)}
-							keyExtractor={(item, index) => index.toString()}
-							style={{ ...screenStyles.textColor, ...screenStyles.root }}
-						/>
-					)}
-					{/* {Object.keys(passwordsData).length === 0 && ( */}
-					<AttachStep index={1} fill={true}>
-						<NoPasswords>
-							<NoPasswordsText
-								style={{
-									fontFamily: "WorkSans-SemiBold",
-									...screenStyles.textColor,
-								}}>
-								No passwords saved
-							</NoPasswordsText>
-						</NoPasswords>
-					</AttachStep>
-					{/* )} */}
-				</Container>
+							{!editNoteMode && (
+								<View
+									style={{
+										flex: 1,
+										flexGrow: 1,
+										...modalStyles.textarea,
+									}}>
+									<ScrollView
+										contentContainerStyle={{
+											flexGrow: 1,
+										}}>
+										<Text>{note}</Text>
+									</ScrollView>
+								</View>
+							)}
+							{!addPasswordMode && (
+								<TouchableOpacity onPress={toggleNoteEditMode}>
+									{!editNoteMode && (
+										<ModalButtonImage
+											source={require("../../assets/edit.png")}
+											style={screenStyles.image}
+										/>
+									)}
+								</TouchableOpacity>
+							)}
+						</View>
+					</TourGuideZone>
+					<View style={modalStyles.buttonContainer}>
+						<TouchableOpacity
+							style={modalStyles.deleteButton}
+							onPress={handleDeleteButton}>
+							<Text style={modalStyles.buttonText}>
+								{editReferenceMode || editPasswordMode ? "Cancel" : "Delete"}
+							</Text>
+						</TouchableOpacity>
+						<TourGuideZone
+							zone={3}
+							tourKey={tourKeyModal}
+							text='Click here to save the password'>
+							<TouchableOpacity
+								style={modalStyles.okButton}
+								id='step5'
+								onPress={handleOkSave}>
+								<Text style={modalStyles.buttonText}>
+									{editReferenceMode || editPasswordMode ? "Save" : "Ok"}
+								</Text>
+							</TouchableOpacity>
+						</TourGuideZone>
+					</View>
+				</View>
+			</Modal>
+			<TourGuideZone
+				zone={0}
+				tourKey={tourKey}
+				text='Click here to add a new password'>
+				<AddPasswordButton
+					onPress={handleAddPassword}
+					darkMode={settings.darkMode}
+				/>
+			</TourGuideZone>
+			<Button onPress={start} title='Tour' />
+			{Object.keys(passwordsData).length > 0 && (
+				<TourGuideZone
+					zone={1}
+					tourKey={tourKey}
+					text='Your passwords will be listed here with last updated first'>
+					<PasswordsList
+						data={Object.keys(passwordsData).reverse()}
+						renderItem={({ item, _ }) => (
+							<PasswordItem
+								reference={item}
+								onPress={handleViewReferenceModal}
+								darkMode={settings.darkMode}
+							/>
+						)}
+						keyExtractor={(item, index) => index.toString()}
+						style={{ ...screenStyles.textColor, ...screenStyles.root }}
+					/>
+				</TourGuideZone>
 			)}
-		</SpotlightTourProvider>
+			{Object.keys(passwordsData).length === 0 && (
+				<NoPasswords>
+					<NoPasswordsText
+						style={{
+							fontFamily: "WorkSans-SemiBold",
+							...screenStyles.textColor,
+						}}>
+						No passwords saved
+					</NoPasswordsText>
+				</NoPasswords>
+			)}
+		</Container>
 	)
 }
