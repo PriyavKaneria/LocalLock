@@ -22,7 +22,7 @@ const migrations = {
 const DEBUG = false
 
 const persistConfig = {
-	key: "root",
+	key: "root2",
 	version: 5,
 	storage: AsyncStorage,
 	stateReconciler: autoMergeLevel2,
