@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
 	BackHandler,
 	View,
@@ -11,6 +11,7 @@ import {
 	AppState,
 	ScrollView,
 	SafeAreaView,
+	Button,
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useDispatch, useSelector } from "react-redux"
@@ -34,6 +35,7 @@ import {
 import PasswordItem from "../../components/PasswordItem"
 import AddPasswordButton from "../../components/AddPasswordButton"
 import { getSecureStoreItemAsync } from "../../utils/secure_store"
+import { useTour } from "../../components/TourComponent"
 
 export default () => {
 	const navigation = useNavigation()
@@ -52,6 +54,22 @@ export default () => {
 	const [password, setPassword] = useState("")
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [note, setNote] = useState("")
+
+	const tourStep2Ref = useRef(null)
+	const tourStep3Ref = useRef(null)
+	const tourStep4Ref = useRef(null)
+
+	useEffect(() => {
+		if (tourStep2Ref.current) {
+			global.step2 = tourStep2Ref.current
+		}
+		if (tourStep3Ref.current) {
+			global.step3 = tourStep3Ref.current
+		}
+		if (tourStep4Ref.current) {
+			global.step4 = tourStep4Ref.current
+		}
+	}, [tourStep2Ref, tourStep3Ref, tourStep4Ref])
 
 	const toggleReferenceEditMode = () => {
 		setEditReferenceMode(!editReferenceMode)
@@ -81,6 +99,7 @@ export default () => {
 			headerRight: () => (
 				<AddButton
 					underlayColor='transparent'
+					id='step7'
 					onPress={() => navigation.navigate("Settings")}>
 					<AddButtonImage
 						source={require("../../assets/settings.png")}
@@ -262,6 +281,8 @@ export default () => {
 		setModalVisible(false)
 	}
 
+	const { startTour } = useTour()
+
 	let [fontsLoaded, error] = useFonts({
 		"WorkSans-SemiBold": require("../../../assets/fonts/WorkSans/WorkSans-SemiBold.ttf"),
 		"WorkSans-Regular": require("../../../assets/fonts/WorkSans/WorkSans-Regular.ttf"),
@@ -411,7 +432,10 @@ export default () => {
 							? "Edit reference"
 							: "Reference"}
 					</Text>
-					<View style={modalStyles.inputContainer}>
+					<View
+						style={modalStyles.inputContainer}
+						id='step2'
+						ref={tourStep2Ref}>
 						<TextInput
 							style={{
 								...modalStyles.input,
@@ -443,7 +467,7 @@ export default () => {
 							? "Password (tap & hold to see, long press to copy)"
 							: "Password (tap and hold to see)"}
 					</Text>
-					<View style={modalStyles.inputContainer}>
+					<View style={modalStyles.inputContainer} id='step3'>
 						<TouchableOpacity
 							onPressIn={() => setPasswordVisible(true)}
 							onPressOut={() => setPasswordVisible(false)}
@@ -491,7 +515,7 @@ export default () => {
 							? "Edit notes"
 							: "Notes"}
 					</Text>
-					<View style={modalStyles.inputContainer}>
+					<View style={modalStyles.inputContainer} id='step4'>
 						{editNoteMode && (
 							<TextInput
 								style={{
@@ -537,6 +561,7 @@ export default () => {
 						</TouchableOpacity>
 						<TouchableOpacity
 							style={modalStyles.okButton}
+							id='step5'
 							onPress={handleOkSave}>
 							<Text style={modalStyles.buttonText}>
 								{editReferenceMode || editPasswordMode ? "Save" : "Ok"}
@@ -549,6 +574,7 @@ export default () => {
 				onPress={handleAddPassword}
 				darkMode={settings.darkMode}
 			/>
+			<Button onPress={() => startTour()} title='Tour' />
 			{Object.keys(passwordsData).length > 0 && (
 				<PasswordsList
 					data={Object.keys(passwordsData).reverse()}
@@ -561,6 +587,7 @@ export default () => {
 					)}
 					keyExtractor={(item, index) => index.toString()}
 					style={{ ...screenStyles.textColor, ...screenStyles.root }}
+					id='step6'
 				/>
 			)}
 			{Object.keys(passwordsData).length === 0 && (

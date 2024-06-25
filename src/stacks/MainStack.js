@@ -9,6 +9,7 @@ const MainStack = createStackNavigator()
 
 export default () => {
 	const settings = useSelector((state) => state.settings.settings)
+
 	return (
 		<MainStack.Navigator
 			screenOptions={{
@@ -17,13 +18,13 @@ export default () => {
 				},
 				headerTintColor: settings.darkMode ? "#fbfbfb" : "#1e1e1e",
 			}}>
-			<MainStack.Screen
+			{/* <MainStack.Screen
 				name='Splash'
 				component={Splash}
 				options={{
 					headerShown: false,
 				}}
-			/>
+			/> */}
 			<MainStack.Screen name='List' component={ListScreen} />
 			<MainStack.Screen name='Settings' component={SettingsScreen} />
 		</MainStack.Navigator>

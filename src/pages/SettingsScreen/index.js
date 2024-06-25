@@ -180,7 +180,7 @@ export default () => {
 	})
 
 	return (
-		<Container style={screenStyles.root}>
+		<Container style={screenStyles.root} id='step8'>
 			<Modal
 				animationIn={"zoomIn"}
 				animationOut={"zoomOut"}

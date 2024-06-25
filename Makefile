@@ -1,3 +1,6 @@
+run start:
+	yarn start
+
 build:
 	eas build -p android --profile production
 
