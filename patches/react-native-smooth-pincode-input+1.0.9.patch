@@ -1,28 +1,35 @@
 diff --git a/node_modules/react-native-smooth-pincode-input/src/index.js b/node_modules/react-native-smooth-pincode-input/src/index.js
-index 0a00f22..9ff9105 100644
+index 0a00f22..33b1ac8 100644
 --- a/node_modules/react-native-smooth-pincode-input/src/index.js
 +++ b/node_modules/react-native-smooth-pincode-input/src/index.js
-@@ -6,7 +6,6 @@ import {
+@@ -6,7 +6,8 @@ import {
    TextInput,
    StyleSheet,
    I18nManager,
 -  ViewPropTypes,
++  ViewStyle,
++  TextStyle,
  } from 'react-native';
  import * as Animatable from 'react-native-animatable';
  
-@@ -286,11 +285,11 @@ SmoothPinCodeInput.propTypes = {
+@@ -286,14 +287,14 @@ SmoothPinCodeInput.propTypes = {
  
    restrictToNumbers: PropTypes.bool,
  
 -  containerStyle: ViewPropTypes.style,
-+  containerStyle: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string,PropTypes.number])),
++  containerStyle: ViewStyle,
  
 -  cellStyle: ViewPropTypes.style,
 -  cellStyleFocused: ViewPropTypes.style,
 -  cellStyleFilled: ViewPropTypes.style,
-+  cellStyle: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string,PropTypes.number])),
-+  cellStyleFocused: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string,PropTypes.number])),
-+  cellStyleFilled: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string,PropTypes.number])),
++  cellStyle: ViewStyle,
++  cellStyleFocused: ViewStyle,
++  cellStyleFilled: ViewStyle,
  
-   textStyle: Text.propTypes.style,
-   textStyleFocused: Text.propTypes.style,
+-  textStyle: Text.propTypes.style,
+-  textStyleFocused: Text.propTypes.style,
++  textStyle: TextStyle,
++  textStyleFocused: TextStyle,
+ 
+   animated: PropTypes.bool,
+   animationFocused: PropTypes.oneOfType([
