@@ -80,15 +80,36 @@ export default () => {
 			title: "Passwords",
 			headerLeft: false,
 			headerRight: () => (
-				<AddButton
-					underlayColor='transparent'
-					id='step7'
-					onPress={() => navigation.navigate("Settings")}>
-					<AddButtonImage
-						source={require("../../assets/settings.png")}
-						style={{ tintColor: settings.darkMode ? "#fbfbfb" : "black" }}
-					/>
-				</AddButton>
+				<View
+					style={{
+						flex: 1,
+						flexDirection: "row",
+						justifyContent: "flex-end",
+						alignItems: "center",
+					}}>
+					<Text
+						onPress={() => {
+							dispatch({
+								type: "SET_TUTORIAL_COMPLETED",
+								payload: false,
+							})
+							setTour("home")
+						}}
+						style={{
+							color: settings.darkMode ? "#fbfbfb" : "black",
+							marginRight: 20,
+						}}>
+						Help
+					</Text>
+					<AddButton
+						underlayColor='transparent'
+						onPress={() => navigation.navigate("Settings")}>
+						<AddButtonImage
+							source={require("../../assets/settings.png")}
+							style={{ tintColor: settings.darkMode ? "#fbfbfb" : "black" }}
+						/>
+					</AddButton>
+				</View>
 			),
 		})
 	}, [settings.darkMode])
@@ -423,6 +444,12 @@ export default () => {
 				setTour("home")
 			}, 2000)
 		}
+		if (passwordsData && Object.keys(passwordsData).length > 0) {
+			dispatch({
+				type: "SET_TUTORIAL_COMPLETED",
+				payload: true,
+			})
+		}
 	}, [])
 
 	useEffect(() => {
@@ -594,7 +621,12 @@ export default () => {
 										contentContainerStyle={{
 											flexGrow: 1,
 										}}>
-										<Text>{note}</Text>
+										<Text
+											style={{
+												color: settings.darkMode ? "#dedede" : "#091e42",
+											}}>
+											{note}
+										</Text>
 									</ScrollView>
 								</View>
 							)}

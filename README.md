@@ -39,6 +39,8 @@ Playstore link - https://play.google.com/store/apps/details?id=com.diginova.loca
 
 - [x] Dark mode
 - [x] Additional fields to store notes
+- [x] Onboarding tour
+  - [x] ? icon for on demand help
 - [ ] QR code based device to device offline sync
 - [ ] Encrypted export for backup and restore via import
 
