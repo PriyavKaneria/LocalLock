@@ -5,7 +5,6 @@ import {
 	StyleSheet,
 	BackHandler,
 	ToastAndroid,
-	Animated,
 	TouchableOpacity,
 	View,
 	Text,
@@ -17,7 +16,13 @@ import * as LocalAuthentication from "expo-local-authentication"
 import { useSelector } from "react-redux"
 import * as Crypto from "expo-crypto"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
-import { getSecureStoreItemAsync, setSecureStoreItemAsync } from "../../utils/secure_store"
+import {
+	getSecureStoreItemAsync,
+	setSecureStoreItemAsync,
+} from "../../utils/secure_store"
+
+import { Animated } from "react-native"
+const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
 export default () => {
 	const [facialRecognitionAvailable, setFacialRecognitionAvailable] =
@@ -265,7 +270,7 @@ export default () => {
 
 	return (
 		<View style={styles.main}>
-			<LottieView
+			<AnimatedLottieView
 				source={require("../../assets/splash.json")}
 				progress={animationProgress.current}
 				style={styles.animation}

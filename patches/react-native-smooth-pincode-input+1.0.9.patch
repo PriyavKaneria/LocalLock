@@ -1,35 +1,67 @@
 diff --git a/node_modules/react-native-smooth-pincode-input/src/index.js b/node_modules/react-native-smooth-pincode-input/src/index.js
-index 0a00f22..33b1ac8 100644
+index 0a00f22..3f80656 100644
 --- a/node_modules/react-native-smooth-pincode-input/src/index.js
 +++ b/node_modules/react-native-smooth-pincode-input/src/index.js
-@@ -6,7 +6,8 @@ import {
+@@ -6,8 +6,8 @@ import {
    TextInput,
    StyleSheet,
    I18nManager,
 -  ViewPropTypes,
-+  ViewStyle,
-+  TextStyle,
  } from 'react-native';
++import { ViewStyle, TextStyle } from 'react-native';
  import * as Animatable from 'react-native-animatable';
  
-@@ -286,14 +287,14 @@ SmoothPinCodeInput.propTypes = {
+ const styles = StyleSheet.create({
+@@ -265,52 +265,4 @@ class SmoothPinCodeInput extends Component {
+   };
+ }
  
-   restrictToNumbers: PropTypes.bool,
- 
+-SmoothPinCodeInput.propTypes = {
+-  value: PropTypes.string,
+-  codeLength: PropTypes.number,
+-  cellSize: PropTypes.number,
+-  cellSpacing: PropTypes.number,
+-
+-  placeholder: PropTypes.oneOfType([
+-    PropTypes.string,
+-    PropTypes.element,
+-  ]),
+-  mask: PropTypes.oneOfType([
+-    PropTypes.string,
+-    PropTypes.element,
+-  ]),
+-  maskDelay: PropTypes.number,
+-  password: PropTypes.bool,
+-
+-  autoFocus: PropTypes.bool,
+-
+-  restrictToNumbers: PropTypes.bool,
+-
 -  containerStyle: ViewPropTypes.style,
-+  containerStyle: ViewStyle,
- 
+-
 -  cellStyle: ViewPropTypes.style,
 -  cellStyleFocused: ViewPropTypes.style,
 -  cellStyleFilled: ViewPropTypes.style,
-+  cellStyle: ViewStyle,
-+  cellStyleFocused: ViewStyle,
-+  cellStyleFilled: ViewStyle,
- 
+-
 -  textStyle: Text.propTypes.style,
 -  textStyleFocused: Text.propTypes.style,
-+  textStyle: TextStyle,
-+  textStyleFocused: TextStyle,
- 
-   animated: PropTypes.bool,
-   animationFocused: PropTypes.oneOfType([
+-
+-  animated: PropTypes.bool,
+-  animationFocused: PropTypes.oneOfType([
+-    PropTypes.string,
+-    PropTypes.object,
+-  ]),
+-
+-  onFulfill: PropTypes.func,
+-  onChangeText: PropTypes.func,
+-  onBackspace: PropTypes.func,
+-  onTextChange: PropTypes.func,
+-  testID: PropTypes.any,
+-  onFocus: PropTypes.func,
+-  onBlur: PropTypes.func,
+-  keyboardType: PropTypes.string,
+-  editable: PropTypes.bool,
+-  inputProps: PropTypes.exact(TextInput.propTypes),
+-};
+-
+ export default SmoothPinCodeInput;
