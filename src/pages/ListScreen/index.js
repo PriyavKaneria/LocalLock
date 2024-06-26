@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
 	BackHandler,
 	View,
@@ -139,10 +139,6 @@ export default () => {
 		}
 		setNote(notesData[_reference] ?? "")
 		setModalVisible(true)
-		// check if tutorial is to be shown
-		setTimeout(() => {
-			start("modal")
-		}, 1000)
 	}
 
 	const setAllFieldsEditMode = (mode) => {
@@ -158,6 +154,13 @@ export default () => {
 		setNote("")
 		setAllFieldsEditMode(true)
 		setModalVisible(true)
+		stop() // stop the tourguide
+		// check if tutorial is to be shown
+		if (!settings.tutorialCompleted) {
+			setTimeout(() => {
+				setTour("modal")
+			}, 1000)
+		}
 	}
 
 	const handleDeleteButton = () => {
@@ -266,6 +269,15 @@ export default () => {
 		setAllFieldsEditMode(false)
 		setAddPasswordMode(false)
 		setModalVisible(false)
+		// finish tour in case it is running
+		// check if tutorial is to be shown
+		if (!settings.tutorialCompleted) {
+			dispatch({
+				type: "SET_TUTORIAL_COMPLETED",
+				payload: true,
+			})
+			setTour("home2")
+		}
 	}
 
 	let [fontsLoaded, error] = useFonts({
@@ -361,11 +373,14 @@ export default () => {
 			alignItems: "center",
 			color: "white",
 		},
+		okButtonGuide: {
+			width: "45%",
+		},
 		okButton: {
 			backgroundColor: settings.darkMode ? "#007E33" : "#00C851", // green background
 			padding: 10,
+			width: "100%",
 			borderRadius: 5,
-			width: "45%",
 			alignItems: "center",
 			color: "white",
 		},
@@ -389,27 +404,41 @@ export default () => {
 	})
 
 	const {
-		canStart, // a boolean indicate if you can start tour guide
 		start, // a function to start the tourguide
 		stop, // a function  to stopping it
-		eventEmitter, // an object for listening some events
 		tourKey, // a string to identify the tourguide
 	} = useTourGuideController("home")
 
 	const {
-		canStart: canStartModal, // a boolean indicate if you can start tour guide
 		start: startModal, // a function to start the tourguide
 		stop: stopModal, // a function  to stopping it
-		eventEmitter: eventEmitterModal, // an object for listening some events
 		tourKey: tourKeyModal, // a string to identify the tourguide
 	} = useTourGuideController("modal")
 
+	const [tour, setTour] = useState("")
+
 	useEffect(() => {
-		if (canStart) {
-			// 👈 test if you can start otherwise nothing will happen
-			start()
+		if (!settings.tutorialCompleted) {
+			setTimeout(() => {
+				setTour("home")
+			}, 2000)
 		}
-	}, [canStart])
+	}, [])
+
+	useEffect(() => {
+		if (tour === "home") {
+			// console.log("Starting tour...")
+			start && start()
+		}
+		if (tour === "home2") {
+			// console.log("Starting tour 2...")
+			start && start(1)
+		}
+		if (tour === "modal") {
+			// console.log("Starting modal tour...")
+			startModal && startModal()
+		}
+	}, [tour])
 
 	if (!fontsLoaded) {
 		return <AppLoading />
@@ -417,6 +446,7 @@ export default () => {
 	return (
 		<Container style={screenStyles.root}>
 			<Modal
+				coverScreen={false}
 				animationIn={"zoomIn"}
 				animationOut={"zoomOut"}
 				isVisible={modalVisible}
@@ -425,11 +455,12 @@ export default () => {
 					setAddPasswordMode(false)
 					setModalVisible(false)
 				}}
-				style={{ margin: 0, marginLeft: 20, marginRight: 20 }}
+				style={{ margin: 0, marginLeft: 20, marginRight: 20, zIndex: 1 }}
 				onBackdropPress={() => {
 					setAllFieldsEditMode(false)
 					setAddPasswordMode(false)
 					setModalVisible(false)
+					stopModal()
 				}}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>
@@ -590,10 +621,11 @@ export default () => {
 						<TourGuideZone
 							zone={3}
 							tourKey={tourKeyModal}
+							style={modalStyles.okButtonGuide}
 							text='Click here to save the password'>
 							<TouchableOpacity
-								style={modalStyles.okButton}
 								id='step5'
+								style={modalStyles.okButton}
 								onPress={handleOkSave}>
 								<Text style={modalStyles.buttonText}>
 									{editReferenceMode || editPasswordMode ? "Save" : "Ok"}
@@ -612,15 +644,20 @@ export default () => {
 					darkMode={settings.darkMode}
 				/>
 			</TourGuideZone>
-			<Button onPress={start} title='Tour' />
 			{Object.keys(passwordsData).length > 0 && (
 				<TourGuideZone
 					zone={1}
 					tourKey={tourKey}
+					style={{
+						...screenStyles.textColor,
+						...screenStyles.root,
+						flex: 1,
+						width: "100%",
+					}}
 					text='Your passwords will be listed here with last updated first'>
 					<PasswordsList
 						data={Object.keys(passwordsData).reverse()}
-						renderItem={({ item, _ }) => (
+						renderItem={({ item }) => (
 							<PasswordItem
 								reference={item}
 								onPress={handleViewReferenceModal}
@@ -628,7 +665,6 @@ export default () => {
 							/>
 						)}
 						keyExtractor={(item, index) => index.toString()}
-						style={{ ...screenStyles.textColor, ...screenStyles.root }}
 					/>
 				</TourGuideZone>
 			)}

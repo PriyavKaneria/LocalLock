@@ -4,6 +4,7 @@ const initialState = {
 		longPressToCopy: false,
 		quickBoot: false,
 		darkMode: false,
+		tutorialCompleted: false,
 	},
 }
 
@@ -41,6 +42,13 @@ export default (state = initialState, action) => {
 
 		case "SET_STATE_SETTINGS":
 			newState = action.payload.settings
+			break
+
+		case "SET_TUTORIAL_COMPLETED":
+			if (typeof action.payload !== "boolean") {
+				throw new Error("Invalid payload type")
+			}
+			newState.tutorialCompleted = action.payload
 			break
 
 		default:
