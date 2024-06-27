@@ -93,7 +93,6 @@ export default () => {
 								type: "SET_TUTORIAL_COMPLETED",
 								payload: false,
 							})
-							setTour("home")
 						}}
 						style={{
 							color: settings.darkMode ? "#fbfbfb" : "black",
@@ -122,14 +121,12 @@ export default () => {
 				navigation.navigate("Splash")
 			}
 		}
-		AppState.addEventListener("change", () => {
+		const subscription = AppState.addEventListener("change", () => {
 			handleStateChange(AppState.currentState)
 		})
 
 		return () => {
-			AppState.removeEventListener("change", () => {
-				handleStateChange(AppState.currentState)
-			})
+			subscription.remove()
 		}
 	}, [navigation])
 
@@ -176,6 +173,7 @@ export default () => {
 		setAllFieldsEditMode(true)
 		setModalVisible(true)
 		stop() // stop the tourguide
+		setTour("")
 		// check if tutorial is to be shown
 		if (!settings.tutorialCompleted) {
 			setTimeout(() => {
@@ -428,29 +426,53 @@ export default () => {
 		start, // a function to start the tourguide
 		stop, // a function  to stopping it
 		tourKey, // a string to identify the tourguide
+		eventEmitter,
 	} = useTourGuideController("home")
 
 	const {
 		start: startModal, // a function to start the tourguide
 		stop: stopModal, // a function  to stopping it
 		tourKey: tourKeyModal, // a string to identify the tourguide
+		eventEmitter: eventEmitterModal,
 	} = useTourGuideController("modal")
 
 	const [tour, setTour] = useState("")
 
 	useEffect(() => {
-		if (!settings.tutorialCompleted) {
-			setTimeout(() => {
-				setTour("home")
-			}, 2000)
-		}
 		if (passwordsData && Object.keys(passwordsData).length > 0) {
 			dispatch({
 				type: "SET_TUTORIAL_COMPLETED",
 				payload: true,
 			})
 		}
+		if (!settings.tutorialCompleted) {
+			setTimeout(() => {
+				setTour("home")
+			}, 2000)
+		}
 	}, [])
+
+	useEffect(() => {
+		if (settings.tutorialCompleted) return
+		if (addPasswordMode) {
+			setTour("modal")
+		} else {
+			setTour("home")
+		}
+	}, [settings.tutorialCompleted])
+
+	useEffect(() => {
+		if (!eventEmitter || !eventEmitterModal) return
+		const resetTour = () => {
+			setTour("")
+		}
+		eventEmitter.on("stop", resetTour)
+		eventEmitterModal.on("stop", resetTour)
+		return () => {
+			eventEmitter.off("stop", resetTour)
+			eventEmitterModal.off("stop", resetTour)
+		}
+	}, [eventEmitter, eventEmitterModal])
 
 	useEffect(() => {
 		if (tour === "home") {
@@ -488,6 +510,7 @@ export default () => {
 					setAddPasswordMode(false)
 					setModalVisible(false)
 					stopModal()
+					setTour("")
 				}}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>

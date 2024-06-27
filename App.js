@@ -19,7 +19,12 @@ export default () => {
 		<Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
 				<NavigationContainer>
-					<TourGuideProvider androidStatusBarVisible={true}>
+					<TourGuideProvider
+						androidStatusBarVisible={true}
+						labels={{
+							finish: "Ok",
+						}}
+						preventOutsideInteraction={true}>
 						<StatusBar />
 						<MainStack />
 					</TourGuideProvider>
