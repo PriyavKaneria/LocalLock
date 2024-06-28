@@ -18,14 +18,15 @@ const migrations = {
 		)
 	},
 	6: (state) => {
-		// Adding a field to check if tutorial has been completed
-		// if passwords already exist, then tutorial has been completed so set to true
-		const tutorialCompleted = Object.keys(state.passwords.passwords).length > 0
+		// Adding a field to check if onboarding has been completed
+		// if passwords already exist, then onboarding has been completed so set to true
+		const onboardingCompleted =
+			Object.keys(state.passwords.passwords).length > 0
 		return {
 			...state,
 			settings: {
 				...state.settings,
-				tutorialCompleted,
+				onboardingCompleted: onboardingCompleted,
 			},
 		}
 	},

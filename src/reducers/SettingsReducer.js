@@ -4,7 +4,7 @@ const initialState = {
 		longPressToCopy: false,
 		quickBoot: false,
 		darkMode: false,
-		tutorialCompleted: false,
+		onboardingCompleted: false,
 	},
 }
 
@@ -44,11 +44,11 @@ export default (state = initialState, action) => {
 			newState = action.payload.settings
 			break
 
-		case "SET_TUTORIAL_COMPLETED":
+		case "SET_ONBOARDING_COMPLETED":
 			if (typeof action.payload !== "boolean") {
 				throw new Error("Invalid payload type")
 			}
-			newState.tutorialCompleted = action.payload
+			newState.onboardingCompleted = action.payload
 			break
 
 		default:

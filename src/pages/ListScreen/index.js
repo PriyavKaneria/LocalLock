@@ -53,6 +53,7 @@ export default () => {
 	const [password, setPassword] = useState("")
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [note, setNote] = useState("")
+	const [showTour, setShowTour] = useState(false)
 
 	const toggleReferenceEditMode = () => {
 		setEditReferenceMode(!editReferenceMode)
@@ -89,10 +90,7 @@ export default () => {
 					}}>
 					<Text
 						onPress={() => {
-							dispatch({
-								type: "SET_TUTORIAL_COMPLETED",
-								payload: false,
-							})
+							setShowTour(true)
 						}}
 						style={{
 							color: settings.darkMode ? "#fbfbfb" : "black",
@@ -441,25 +439,22 @@ export default () => {
 	useEffect(() => {
 		if (passwordsData && Object.keys(passwordsData).length > 0) {
 			dispatch({
-				type: "SET_TUTORIAL_COMPLETED",
+				type: "SET_ONBOARDING_COMPLETED",
 				payload: true,
 			})
-		}
-		if (!settings.tutorialCompleted) {
-			setTimeout(() => {
-				setTour("home")
-			}, 2000)
 		}
 	}, [])
 
 	useEffect(() => {
-		if (settings.tutorialCompleted) return
+		if (!showTour) return
 		if (addPasswordMode) {
 			setTour("modal")
+			setShowTour(false)
 		} else {
 			setTour("home")
+			setShowTour(false)
 		}
-	}, [settings.tutorialCompleted])
+	}, [showTour])
 
 	useEffect(() => {
 		if (!eventEmitter || !eventEmitterModal) return
@@ -475,17 +470,26 @@ export default () => {
 	}, [eventEmitter, eventEmitterModal])
 
 	useEffect(() => {
-		if (tour === "home") {
-			// console.log("Starting tour...")
-			start && start()
-		}
-		if (tour === "home2") {
-			// console.log("Starting tour 2...")
-			start && start(1)
-		}
-		if (tour === "modal") {
-			// console.log("Starting modal tour...")
-			startModal && startModal()
+		switch (tour) {
+			case "":
+				stop()
+				stopModal()
+				setShowTour(false)
+				break
+			case "home":
+				// console.log("Starting tour...")
+				start && start()
+				break
+			case "home2":
+				// console.log("Starting tour 2...")
+				start && start(1)
+				break
+			case "modal":
+				// console.log("Starting modal tour...")
+				startModal && startModal()
+				break
+			default:
+				break
 		}
 	}, [tour])
 
@@ -511,19 +515,20 @@ export default () => {
 					setModalVisible(false)
 					stopModal()
 					setTour("")
+					setShowTour(false)
 				}}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>
 						{addPasswordMode
-							? "Add unique Reference"
+							? "Add id/title"
 							: editReferenceMode
-							? "Edit reference"
+							? "Edit id/title"
 							: "Reference"}
 					</Text>
 					<TourGuideZone
 						zone={0}
 						tourKey={tourKeyModal}
-						text='Add a unique reference for identification'>
+						text='Add id/title for password'>
 						<View style={modalStyles.inputContainer} id='step2'>
 							<TextInput
 								style={{
@@ -533,7 +538,7 @@ export default () => {
 								editable={editReferenceMode}
 								onChangeText={(text) => setReference(text)}
 								value={reference}
-								placeholder='Enter reference text'
+								placeholder='Enter id/title'
 								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
 							/>
 							{!addPasswordMode && (

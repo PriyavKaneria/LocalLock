@@ -9,11 +9,12 @@ import {
 	View,
 	Text,
 	Alert,
+	Dimensions,
 } from "react-native"
 import AppLoading from "expo-app-loading"
 import { useFonts } from "expo-font"
 import * as LocalAuthentication from "expo-local-authentication"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import * as Crypto from "expo-crypto"
 import SmoothPinCodeInput from "react-native-smooth-pincode-input"
 import {
@@ -21,7 +22,8 @@ import {
 	setSecureStoreItemAsync,
 } from "../../utils/secure_store"
 
-import { Animated } from "react-native"
+import { Animated, Image } from "react-native"
+import Onboarding from "react-native-onboarding-swiper"
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
 export default () => {
@@ -39,6 +41,7 @@ export default () => {
 	const [isPinSet, setIsPinSet] = useState(false)
 
 	const [pin, setPin] = useState("")
+	const dispatch = useDispatch()
 
 	const checkSupportedAuthentication = async () => {
 		const types = await LocalAuthentication.supportedAuthenticationTypesAsync()
@@ -78,7 +81,7 @@ export default () => {
 				if (!pinHash) {
 					ToastAndroid.show(
 						"Please set a PIN for future use",
-						ToastAndroid.SHORT
+						ToastAndroid.LONG
 					)
 					setLoading(false)
 					return
@@ -147,13 +150,25 @@ export default () => {
 				duration: 3500,
 				useNativeDriver: false,
 			}).start(() => {
-				if (!checking && !loading && !authenticated) authenticate()
+				if (
+					!checking &&
+					!loading &&
+					!authenticated &&
+					settings.onboardingCompleted
+				)
+					authenticate()
 			})
 		}
 	}, [isFocused])
 
 	useEffect(() => {
-		if (!checking && !loading && !authenticated) authenticate()
+		if (!checking && !loading && !authenticated && settings.onboardingCompleted)
+			authenticate()
+		// temporary
+		dispatch({
+			type: "SET_ONBOARDING_COMPLETED",
+			payload: false,
+		})
 	}, [checking])
 
 	useEffect(() => {
@@ -229,6 +244,8 @@ export default () => {
 			justifyContent: "center",
 			alignItems: "center",
 			backgroundColor: settings.darkMode ? "#252526" : "white",
+			width: "100%",
+			height: "100%",
 		},
 		animation: {
 			width: 400,
@@ -266,42 +283,177 @@ export default () => {
 			textAlign: "center",
 			color: settings.darkMode ? "#fbfbfb" : "#000000",
 		},
+		doneButtonText: {
+			fontFamily: "WorkSans-SemiBold",
+			fontSize: 20,
+			paddingRight: 50,
+			textAlign: "right",
+			color: "#000000",
+		},
 	})
 
 	return (
 		<View style={styles.main}>
-			<AnimatedLottieView
-				source={require("../../assets/splash.json")}
-				progress={animationProgress.current}
-				style={styles.animation}
-			/>
-			{/* Input with label to enter PIN */}
-			<View style={styles.inputContainer}>
-				<Text style={styles.inputLabel}>
-					{isPinSet ? "Enter PIN" : "Set PIN"}
-				</Text>
-				<SmoothPinCodeInput
-					cellStyle={{
-						borderBottomWidth: 2,
-						borderColor: "gray",
+			{!settings.onboardingCompleted && (
+				<Onboarding
+					containerStyles={{
+						flex: 1,
+						paddingVertical: 0,
+						marginVertical: 0,
 					}}
-					cellStyleFocused={{
-						borderColor: settings.darkMode ? "white" : "black",
+					flatlistProps={{
+						contentContainerStyle: {
+							paddingHorizontal: 30,
+							paddingStart: 30,
+						},
+						snapToAlignment: "start",
+						snapToInterval: Dimensions.get("window").width,
+						horizontal: true,
+						disableIntervalMomentum: true,
 					}}
-					textStyleFocused={{
-						color: settings.darkMode ? "white" : "black",
+					imageContainerStyles={{
+						display: "flex",
+						flexDirection: "column",
+						overflow: "hidden",
+						height: "70%",
+						width: "100%",
+						justifyContent: "flex-start",
+						paddingTop: 200,
+						paddingBottom: "unset",
+						paddingTop: 0,
+						alignItems: "flex-start",
 					}}
-					value={pin}
-					password
-					onTextChange={(text) => handlePinInput(text)}
+					onDone={() => {
+						dispatch({
+							type: "SET_ONBOARDING_COMPLETED",
+							payload: true,
+						})
+						authenticate()
+					}}
+					showSkip={false}
+					showNext={false}
+					DoneButtonComponent={(props) => (
+						<Text {...props} style={styles.doneButtonText}>
+							Done
+						</Text>
+					)}
+					pages={[
+						{
+							backgroundColor: "#fff",
+							image: (
+								<Image
+									source={require("../../assets/onboarding1.png")}
+									style={{
+										width: "100%",
+										height: "100%",
+										marginTop: 0,
+									}}
+								/>
+							),
+							title: "How to use",
+							subtitle: "Click on add password to add new entry",
+						},
+						{
+							backgroundColor: "#fff",
+							image: (
+								<Image
+									source={require("../../assets/onboarding2.png")}
+									style={{
+										width: "100%",
+										height: "100%",
+										marginTop: 0,
+									}}
+								/>
+							),
+							title: "Enter details",
+							subtitle: "Add a id or title, the password and additional notes",
+						},
+						{
+							backgroundColor: "#fff",
+							image: (
+								<Image
+									source={require("../../assets/onboarding3.png")}
+									style={{
+										width: "100%",
+										height: "100%",
+										marginTop: 0,
+									}}
+								/>
+							),
+							title: "View passwords",
+							subtitle:
+								"Passwords will be listed with the last updated first. Click on any entry to view the details",
+						},
+						{
+							backgroundColor: "#fff",
+							image: (
+								<Image
+									source={require("../../assets/onboarding4.png")}
+									style={{
+										width: "100%",
+										height: "100%",
+										marginTop: 0,
+									}}
+								/>
+							),
+							title: "Edit details",
+							subtitle:
+								"Update the id, password or notes by clicking on the edit button as shown",
+						},
+						{
+							backgroundColor: "#fff",
+							image: (
+								<Image
+									source={require("../../assets/onboarding5.png")}
+									style={{
+										width: "100%",
+										height: "100%",
+										marginTop: 0,
+									}}
+								/>
+							),
+							title: "Update details",
+							subtitle: "In edit mode update the field and click ok to save",
+						},
+					]}
 				/>
-				{/* Button to authenticate with biometrics */}
-				<TouchableOpacity
-					onPress={() => authenticate()}
-					style={styles.biometricsButton}>
-					<Text style={styles.buttonText}>Use Biometrics</Text>
-				</TouchableOpacity>
-			</View>
+			)}
+			{settings.onboardingCompleted && (
+				<>
+					<AnimatedLottieView
+						source={require("../../assets/splash.json")}
+						progress={animationProgress.current}
+						style={styles.animation}
+					/>
+					{/* Input with label to enter PIN */}
+					<View style={styles.inputContainer}>
+						<Text style={styles.inputLabel}>
+							{isPinSet ? "Enter PIN" : "Set PIN"}
+						</Text>
+						<SmoothPinCodeInput
+							cellStyle={{
+								borderBottomWidth: 2,
+								borderColor: "gray",
+							}}
+							cellStyleFocused={{
+								borderColor: settings.darkMode ? "white" : "black",
+							}}
+							textStyleFocused={{
+								color: settings.darkMode ? "white" : "black",
+							}}
+							value={pin}
+							password
+							onTextChange={(text) => handlePinInput(text)}
+						/>
+						{/* Button to authenticate with biometrics */}
+						<TouchableOpacity
+							onPress={() => authenticate()}
+							style={styles.biometricsButton}>
+							<Text style={styles.buttonText}>Use Biometrics</Text>
+						</TouchableOpacity>
+					</View>
+				</>
+			)}
 		</View>
 	)
 }
