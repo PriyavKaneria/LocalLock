@@ -164,11 +164,6 @@ export default () => {
 	useEffect(() => {
 		if (!checking && !loading && !authenticated && settings.onboardingCompleted)
 			authenticate()
-		// temporary
-		dispatch({
-			type: "SET_ONBOARDING_COMPLETED",
-			payload: false,
-		})
 	}, [checking])
 
 	useEffect(() => {
@@ -331,7 +326,11 @@ export default () => {
 						authenticate()
 					}}
 					showSkip={false}
-					showNext={false}
+					NextButtonComponent={(props) => (
+						<Text {...props} style={styles.doneButtonText}>
+							Next
+						</Text>
+					)}
 					DoneButtonComponent={(props) => (
 						<Text {...props} style={styles.doneButtonText}>
 							Done

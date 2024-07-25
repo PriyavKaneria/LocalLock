@@ -34,7 +34,6 @@ import {
 import PasswordItem from "../../components/PasswordItem"
 import AddPasswordButton from "../../components/AddPasswordButton"
 import { getSecureStoreItemAsync } from "../../utils/secure_store"
-import { TourGuideZone, useTourGuideController } from "rn-tourguide"
 
 export default () => {
 	const navigation = useNavigation()
@@ -53,7 +52,6 @@ export default () => {
 	const [password, setPassword] = useState("")
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [note, setNote] = useState("")
-	const [showTour, setShowTour] = useState(false)
 
 	const toggleReferenceEditMode = () => {
 		setEditReferenceMode(!editReferenceMode)
@@ -90,7 +88,12 @@ export default () => {
 					}}>
 					<Text
 						onPress={() => {
-							setShowTour(true)
+							// start splash screen onboarding
+							dispatch({
+								type: "SET_ONBOARDING_COMPLETED",
+								payload: false,
+							})
+							navigation.navigate("Splash")
 						}}
 						style={{
 							color: settings.darkMode ? "#fbfbfb" : "black",
@@ -170,14 +173,6 @@ export default () => {
 		setNote("")
 		setAllFieldsEditMode(true)
 		setModalVisible(true)
-		stop() // stop the tourguide
-		setTour("")
-		// check if tutorial is to be shown
-		if (!settings.tutorialCompleted) {
-			setTimeout(() => {
-				setTour("modal")
-			}, 1000)
-		}
 	}
 
 	const handleDeleteButton = () => {
@@ -286,15 +281,6 @@ export default () => {
 		setAllFieldsEditMode(false)
 		setAddPasswordMode(false)
 		setModalVisible(false)
-		// finish tour in case it is running
-		// check if tutorial is to be shown
-		if (!settings.tutorialCompleted) {
-			dispatch({
-				type: "SET_TUTORIAL_COMPLETED",
-				payload: true,
-			})
-			setTour("home2")
-		}
 	}
 
 	let [fontsLoaded, error] = useFonts({
@@ -390,13 +376,10 @@ export default () => {
 			alignItems: "center",
 			color: "white",
 		},
-		okButtonGuide: {
-			width: "45%",
-		},
 		okButton: {
 			backgroundColor: settings.darkMode ? "#007E33" : "#00C851", // green background
 			padding: 10,
-			width: "100%",
+			width: "45%",
 			borderRadius: 5,
 			alignItems: "center",
 			color: "white",
@@ -420,22 +403,6 @@ export default () => {
 		},
 	})
 
-	const {
-		start, // a function to start the tourguide
-		stop, // a function  to stopping it
-		tourKey, // a string to identify the tourguide
-		eventEmitter,
-	} = useTourGuideController("home")
-
-	const {
-		start: startModal, // a function to start the tourguide
-		stop: stopModal, // a function  to stopping it
-		tourKey: tourKeyModal, // a string to identify the tourguide
-		eventEmitter: eventEmitterModal,
-	} = useTourGuideController("modal")
-
-	const [tour, setTour] = useState("")
-
 	useEffect(() => {
 		if (passwordsData && Object.keys(passwordsData).length > 0) {
 			dispatch({
@@ -444,54 +411,6 @@ export default () => {
 			})
 		}
 	}, [])
-
-	useEffect(() => {
-		if (!showTour) return
-		if (addPasswordMode) {
-			setTour("modal")
-			setShowTour(false)
-		} else {
-			setTour("home")
-			setShowTour(false)
-		}
-	}, [showTour])
-
-	useEffect(() => {
-		if (!eventEmitter || !eventEmitterModal) return
-		const resetTour = () => {
-			setTour("")
-		}
-		eventEmitter.on("stop", resetTour)
-		eventEmitterModal.on("stop", resetTour)
-		return () => {
-			eventEmitter.off("stop", resetTour)
-			eventEmitterModal.off("stop", resetTour)
-		}
-	}, [eventEmitter, eventEmitterModal])
-
-	useEffect(() => {
-		switch (tour) {
-			case "":
-				stop()
-				stopModal()
-				setShowTour(false)
-				break
-			case "home":
-				// console.log("Starting tour...")
-				start && start()
-				break
-			case "home2":
-				// console.log("Starting tour 2...")
-				start && start(1)
-				break
-			case "modal":
-				// console.log("Starting modal tour...")
-				startModal && startModal()
-				break
-			default:
-				break
-		}
-	}, [tour])
 
 	if (!fontsLoaded) {
 		return <AppLoading />
@@ -513,9 +432,6 @@ export default () => {
 					setAllFieldsEditMode(false)
 					setAddPasswordMode(false)
 					setModalVisible(false)
-					stopModal()
-					setTour("")
-					setShowTour(false)
 				}}>
 				<View style={modalStyles.root}>
 					<Text style={modalStyles.floatLeft}>
@@ -525,34 +441,29 @@ export default () => {
 							? "Edit id/title"
 							: "Reference"}
 					</Text>
-					<TourGuideZone
-						zone={0}
-						tourKey={tourKeyModal}
-						text='Add id/title for password'>
-						<View style={modalStyles.inputContainer} id='step2'>
-							<TextInput
-								style={{
-									...modalStyles.input,
-									width: addPasswordMode || editReferenceMode ? "100%" : "90%",
-								}}
-								editable={editReferenceMode}
-								onChangeText={(text) => setReference(text)}
-								value={reference}
-								placeholder='Enter id/title'
-								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
-							/>
-							{!addPasswordMode && (
-								<TouchableOpacity onPress={toggleReferenceEditMode}>
-									{!editReferenceMode && (
-										<ModalButtonImage
-											source={require("../../assets/edit.png")}
-											style={screenStyles.image}
-										/>
-									)}
-								</TouchableOpacity>
-							)}
-						</View>
-					</TourGuideZone>
+					<View style={modalStyles.inputContainer} id='step2'>
+						<TextInput
+							style={{
+								...modalStyles.input,
+								width: addPasswordMode || editReferenceMode ? "100%" : "90%",
+							}}
+							editable={editReferenceMode}
+							onChangeText={(text) => setReference(text)}
+							value={reference}
+							placeholder='Enter id/title'
+							placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
+						/>
+						{!addPasswordMode && (
+							<TouchableOpacity onPress={toggleReferenceEditMode}>
+								{!editReferenceMode && (
+									<ModalButtonImage
+										source={require("../../assets/edit.png")}
+										style={screenStyles.image}
+									/>
+								)}
+							</TouchableOpacity>
+						)}
+					</View>
 					<Text style={modalStyles.floatLeft}>
 						{addPasswordMode
 							? "Add Password"
@@ -562,54 +473,47 @@ export default () => {
 							? "Password (tap & hold to see, long press to copy)"
 							: "Password (tap and hold to see)"}
 					</Text>
-					<TourGuideZone
-						zone={1}
-						tourKey={tourKeyModal}
-						text='Add the password here'>
-						<View style={modalStyles.inputContainer} id='step3'>
-							<TouchableOpacity
-								onPressIn={() => setPasswordVisible(true)}
-								onPressOut={() => setPasswordVisible(false)}
-								onLongPress={() => {
-									if (!editPasswordMode && settings.longPressToCopy) {
-										// copy password to clipboard
-										Clipboard.setStringAsync(password).then(() => {
-											ToastAndroid.show(
-												"Password copied to clipboard",
-												ToastAndroid.SHORT
-											)
-										})
-									}
-								}}
-								activeOpacity={1}
-								style={{
-									...modalStyles.input,
-									width: addPasswordMode || editPasswordMode ? "100%" : "90%",
-								}}>
-								<TextInput
-									style={modalStyles.nomargin}
-									editable={editPasswordMode}
-									onChangeText={(text) => setPassword(text)}
-									value={password}
-									placeholder='Enter password'
-									placeholderTextColor={
-										settings.darkMode ? "#828282" : "#a3a3a3"
-									}
-									secureTextEntry={!editPasswordMode && !passwordVisible}
-								/>
+					<View style={modalStyles.inputContainer} id='step3'>
+						<TouchableOpacity
+							onPressIn={() => setPasswordVisible(true)}
+							onPressOut={() => setPasswordVisible(false)}
+							onLongPress={() => {
+								if (!editPasswordMode && settings.longPressToCopy) {
+									// copy password to clipboard
+									Clipboard.setStringAsync(password).then(() => {
+										ToastAndroid.show(
+											"Password copied to clipboard",
+											ToastAndroid.SHORT
+										)
+									})
+								}
+							}}
+							activeOpacity={1}
+							style={{
+								...modalStyles.input,
+								width: addPasswordMode || editPasswordMode ? "100%" : "90%",
+							}}>
+							<TextInput
+								style={modalStyles.nomargin}
+								editable={editPasswordMode}
+								onChangeText={(text) => setPassword(text)}
+								value={password}
+								placeholder='Enter password'
+								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
+								secureTextEntry={!editPasswordMode && !passwordVisible}
+							/>
+						</TouchableOpacity>
+						{!addPasswordMode && (
+							<TouchableOpacity onPress={togglePasswordEditMode}>
+								{!editPasswordMode && (
+									<ModalButtonImage
+										source={require("../../assets/edit.png")}
+										style={screenStyles.image}
+									/>
+								)}
 							</TouchableOpacity>
-							{!addPasswordMode && (
-								<TouchableOpacity onPress={togglePasswordEditMode}>
-									{!editPasswordMode && (
-										<ModalButtonImage
-											source={require("../../assets/edit.png")}
-											style={screenStyles.image}
-										/>
-									)}
-								</TouchableOpacity>
-							)}
-						</View>
-					</TourGuideZone>
+						)}
+					</View>
 					<Text style={modalStyles.floatLeft}>
 						{addPasswordMode
 							? "Add Notes"
@@ -617,59 +521,52 @@ export default () => {
 							? "Edit notes"
 							: "Notes"}
 					</Text>
-					<TourGuideZone
-						zone={2}
-						tourKey={tourKeyModal}
-						text='Optionally add notes here'>
-						<View style={modalStyles.inputContainer} id='step4'>
-							{editNoteMode && (
-								<TextInput
-									style={{
-										...modalStyles.textarea,
-										width: addPasswordMode || editNoteMode ? "100%" : "90%",
-									}}
-									editable={editNoteMode}
-									onChangeText={(text) => setNote(text)}
-									value={note}
-									multiline={true}
-									placeholder='Enter notes...'
-									placeholderTextColor={
-										settings.darkMode ? "#828282" : "#a3a3a3"
-									}
-								/>
-							)}
-							{!editNoteMode && (
-								<View
-									style={{
-										flex: 1,
+					<View style={modalStyles.inputContainer} id='step4'>
+						{editNoteMode && (
+							<TextInput
+								style={{
+									...modalStyles.textarea,
+									width: addPasswordMode || editNoteMode ? "100%" : "90%",
+								}}
+								editable={editNoteMode}
+								onChangeText={(text) => setNote(text)}
+								value={note}
+								multiline={true}
+								placeholder='Enter notes...'
+								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
+							/>
+						)}
+						{!editNoteMode && (
+							<View
+								style={{
+									flex: 1,
+									flexGrow: 1,
+									...modalStyles.textarea,
+								}}>
+								<ScrollView
+									contentContainerStyle={{
 										flexGrow: 1,
-										...modalStyles.textarea,
 									}}>
-									<ScrollView
-										contentContainerStyle={{
-											flexGrow: 1,
+									<Text
+										style={{
+											color: settings.darkMode ? "#dedede" : "#091e42",
 										}}>
-										<Text
-											style={{
-												color: settings.darkMode ? "#dedede" : "#091e42",
-											}}>
-											{note}
-										</Text>
-									</ScrollView>
-								</View>
-							)}
-							{!addPasswordMode && (
-								<TouchableOpacity onPress={toggleNoteEditMode}>
-									{!editNoteMode && (
-										<ModalButtonImage
-											source={require("../../assets/edit.png")}
-											style={screenStyles.image}
-										/>
-									)}
-								</TouchableOpacity>
-							)}
-						</View>
-					</TourGuideZone>
+										{note}
+									</Text>
+								</ScrollView>
+							</View>
+						)}
+						{!addPasswordMode && (
+							<TouchableOpacity onPress={toggleNoteEditMode}>
+								{!editNoteMode && (
+									<ModalButtonImage
+										source={require("../../assets/edit.png")}
+										style={screenStyles.image}
+									/>
+								)}
+							</TouchableOpacity>
+						)}
+					</View>
 					<View style={modalStyles.buttonContainer}>
 						<TouchableOpacity
 							style={modalStyles.deleteButton}
@@ -678,55 +575,33 @@ export default () => {
 								{editReferenceMode || editPasswordMode ? "Cancel" : "Delete"}
 							</Text>
 						</TouchableOpacity>
-						<TourGuideZone
-							zone={3}
-							tourKey={tourKeyModal}
-							style={modalStyles.okButtonGuide}
-							text='Click here to save the password'>
-							<TouchableOpacity
-								id='step5'
-								style={modalStyles.okButton}
-								onPress={handleOkSave}>
-								<Text style={modalStyles.buttonText}>
-									{editReferenceMode || editPasswordMode ? "Save" : "Ok"}
-								</Text>
-							</TouchableOpacity>
-						</TourGuideZone>
+						<TouchableOpacity
+							id='step5'
+							style={modalStyles.okButton}
+							onPress={handleOkSave}>
+							<Text style={modalStyles.buttonText}>
+								{editReferenceMode || editPasswordMode ? "Save" : "Ok"}
+							</Text>
+						</TouchableOpacity>
 					</View>
 				</View>
 			</Modal>
-			<TourGuideZone
-				zone={0}
-				tourKey={tourKey}
-				text='Click here to add a new password'>
-				<AddPasswordButton
-					onPress={handleAddPassword}
-					darkMode={settings.darkMode}
-				/>
-			</TourGuideZone>
+			<AddPasswordButton
+				onPress={handleAddPassword}
+				darkMode={settings.darkMode}
+			/>
 			{Object.keys(passwordsData).length > 0 && (
-				<TourGuideZone
-					zone={1}
-					tourKey={tourKey}
-					style={{
-						...screenStyles.textColor,
-						...screenStyles.root,
-						flex: 1,
-						width: "100%",
-					}}
-					text='Your passwords will be listed here with last updated first'>
-					<PasswordsList
-						data={Object.keys(passwordsData).reverse()}
-						renderItem={({ item }) => (
-							<PasswordItem
-								reference={item}
-								onPress={handleViewReferenceModal}
-								darkMode={settings.darkMode}
-							/>
-						)}
-						keyExtractor={(item, index) => index.toString()}
-					/>
-				</TourGuideZone>
+				<PasswordsList
+					data={Object.keys(passwordsData).reverse()}
+					renderItem={({ item }) => (
+						<PasswordItem
+							reference={item}
+							onPress={handleViewReferenceModal}
+							darkMode={settings.darkMode}
+						/>
+					)}
+					keyExtractor={(item, index) => index.toString()}
+				/>
 			)}
 			{Object.keys(passwordsData).length === 0 && (
 				<NoPasswords>
