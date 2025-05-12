@@ -1,5 +1,0 @@
-* Setup expo app
-
-* Added basic splash screens
-
-* Biometric authentication permission setup

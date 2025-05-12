@@ -1,7 +1,0 @@
-* Added support to store additional multiline notes for each reference.
-
-* Order of references with last updated first
-
-* Migrated to a better state reconciler for seamless future state updates
-
-* Fixed app install crash issue due to SecureStore invalidation
