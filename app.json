@@ -1,63 +1,59 @@
 {
-  "expo": {
-    "name": "Local Lock",
-    "slug": "locallock",
-    "version": "0.6.1",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#F8FAFC"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F8FAFC"
-      },
-      "package": "com.diginova.locallock",
-      "versionCode": 7,
-      "permissions": [
-        "USE_BIOMETRIC"
-      ],
-      "blockedPermissions": [
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "INTERNET",
-        "SYSTEM_ALERT_WINDOW",
-        "VIBRATE"
-      ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "a4920cd8-845d-43dc-a4c0-072323f5698d"
-      }
-    },
-    "owner": "diginova",
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "enableProguardInReleaseBuilds": true,
-            "allowBackup": false
-          }
-        }
-      ],
-      "expo-font",
-      "expo-secure-store"
-    ]
-  }
+	"expo": {
+		"name": "Local Lock",
+		"slug": "locallock",
+		"version": "0.7.2",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "cover",
+			"backgroundColor": "#F8FAFC"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#F8FAFC"
+			},
+			"package": "com.diginova.locallock",
+			"versionCode": 9,
+			"permissions": ["USE_BIOMETRIC"],
+			"blockedPermissions": [
+				"READ_EXTERNAL_STORAGE",
+				"WRITE_EXTERNAL_STORAGE",
+				"INTERNET",
+				"SYSTEM_ALERT_WINDOW",
+				"VIBRATE"
+			]
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"extra": {
+			"eas": {
+				"projectId": "a4920cd8-845d-43dc-a4c0-072323f5698d"
+			}
+		},
+		"owner": "diginova",
+		"plugins": [
+			[
+				"expo-build-properties",
+				{
+					"android": {
+						"enableProguardInReleaseBuilds": true,
+						"allowBackup": false
+					}
+				}
+			],
+			"expo-font",
+			"expo-secure-store"
+		]
+	}
 }

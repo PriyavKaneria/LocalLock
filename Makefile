@@ -2,7 +2,7 @@ run start:
 	yarn start
 
 build:
-	eas build -p android --profile production
+	yarn eas build -p android --profile production
 
 build-preview:
-	eas build -p android --profile preview
+	yarn eas build -p android --profile preview
