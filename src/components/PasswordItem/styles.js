@@ -16,3 +16,15 @@ export const Title = styled.Text`
 	font-size: 19px;
 	text-decoration: none;
 `
+
+export const CategoryBadge = styled.View`
+	padding: 3px 10px;
+	border-radius: 10px;
+	margin-left: 10px;
+	align-self: center;
+`
+
+export const CategoryText = styled.Text`
+	font-size: 13px;
+	color: #fff;
+`

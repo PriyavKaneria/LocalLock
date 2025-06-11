@@ -1,0 +1,5 @@
+* Search passwords
+
+* Sort passwords based on last updated, a-z, categories
+
+* Added support for creating, assigning categories

@@ -5,6 +5,7 @@ const initialState = {
 		quickBoot: false,
 		darkMode: false,
 		onboardingCompleted: false,
+		sortOption: "lastUpdated", // new: save sort option
 	},
 }
 
@@ -49,6 +50,13 @@ export default (state = initialState, action) => {
 				throw new Error("Invalid payload type")
 			}
 			newState.onboardingCompleted = action.payload
+			break
+
+		case "SET_SORT_OPTION":
+			if (typeof action.payload !== "string") {
+				throw new Error("Invalid payload type")
+			}
+			newState.sortOption = action.payload
 			break
 
 		default:

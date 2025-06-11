@@ -46,7 +46,7 @@ export default () => {
 					underlayColor='transparent'
 					onPress={() => navigation.navigate("List")}>
 					<AddButtonImage
-						source={require("../../assets/exit.png")}
+						source={require("../../../assets/app/exit.png")}
 						style={{ tintColor: settings.darkMode ? "#fbfbfb" : "#000000" }}
 					/>
 				</AddButton>

@@ -1,6 +1,6 @@
 import { useNavigation, useIsFocused } from "@react-navigation/native"
 import LottieView from "lottie-react-native"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import {
 	StyleSheet,
 	BackHandler,
@@ -11,7 +11,7 @@ import {
 	Alert,
 	Dimensions,
 } from "react-native"
-import AppLoading from "expo-app-loading"
+import * as SplashScreen from "expo-splash-screen"
 import { useFonts } from "expo-font"
 import * as LocalAuthentication from "expo-local-authentication"
 import { useDispatch, useSelector } from "react-redux"
@@ -229,9 +229,9 @@ export default () => {
 		"WorkSans-Regular": require("../../../assets/fonts/WorkSans/WorkSans-Regular.ttf"),
 	})
 
-	if (!fontsLoaded) {
-		return <AppLoading />
-	}
+	const onLayoutRootView = useCallback(async () => {
+		await SplashScreen.hideAsync()
+	})
 
 	const styles = StyleSheet.create({
 		main: {
@@ -287,8 +287,12 @@ export default () => {
 		},
 	})
 
+	if (!fontsLoaded) {
+		return null
+	}
+
 	return (
-		<View style={styles.main}>
+		<View style={styles.main} onLayout={onLayoutRootView}>
 			{!settings.onboardingCompleted && (
 				<Onboarding
 					containerStyles={{
@@ -313,9 +317,7 @@ export default () => {
 						height: "70%",
 						width: "100%",
 						justifyContent: "flex-start",
-						paddingTop: 200,
 						paddingBottom: "unset",
-						paddingTop: 0,
 						alignItems: "flex-start",
 					}}
 					onDone={() => {
@@ -341,7 +343,7 @@ export default () => {
 							backgroundColor: "#fff",
 							image: (
 								<Image
-									source={require("../../assets/onboarding1.png")}
+									source={require("../../../assets/app/onboarding1.png")}
 									style={{
 										width: "100%",
 										height: "100%",
@@ -356,7 +358,7 @@ export default () => {
 							backgroundColor: "#fff",
 							image: (
 								<Image
-									source={require("../../assets/onboarding2.png")}
+									source={require("../../../assets/app/onboarding2.png")}
 									style={{
 										width: "100%",
 										height: "100%",
@@ -371,7 +373,7 @@ export default () => {
 							backgroundColor: "#fff",
 							image: (
 								<Image
-									source={require("../../assets/onboarding3.png")}
+									source={require("../../../assets/app/onboarding3.png")}
 									style={{
 										width: "100%",
 										height: "100%",
@@ -387,7 +389,7 @@ export default () => {
 							backgroundColor: "#fff",
 							image: (
 								<Image
-									source={require("../../assets/onboarding4.png")}
+									source={require("../../../assets/app/onboarding4.png")}
 									style={{
 										width: "100%",
 										height: "100%",
@@ -403,7 +405,7 @@ export default () => {
 							backgroundColor: "#fff",
 							image: (
 								<Image
-									source={require("../../assets/onboarding5.png")}
+									source={require("../../../assets/app/onboarding5.png")}
 									style={{
 										width: "100%",
 										height: "100%",
@@ -420,7 +422,7 @@ export default () => {
 			{settings.onboardingCompleted && (
 				<>
 					<AnimatedLottieView
-						source={require("../../assets/splash.json")}
+						source={require("../../../assets/app/splash.json")}
 						progress={animationProgress.current}
 						style={styles.animation}
 					/>

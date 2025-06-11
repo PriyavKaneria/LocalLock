@@ -41,6 +41,8 @@ Playstore link - https://play.google.com/store/apps/details?id=com.diginova.loca
 - [x] Additional fields to store notes
 - [x] Onboarding tour
   - [x] ? icon for on demand help
+- [x] Search, sort passwords
+- [x] Create and assign categories
 - [ ] QR code based device to device offline sync
 - [ ] Encrypted export for backup and restore via import
 

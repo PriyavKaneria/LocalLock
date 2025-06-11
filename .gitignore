@@ -14,3 +14,6 @@ web-build/
 .DS_Store
 
 %ProgramData%
+
+android
+logs.txt

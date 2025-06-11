@@ -36,7 +36,7 @@ const DEBUG = false
 
 const persistConfig = {
 	key: "root",
-	version: 6,
+	version: 7,
 	storage: AsyncStorage,
 	stateReconciler: autoMergeLevel2,
 	migrate: createMigrate(migrations, { debug: DEBUG }),
