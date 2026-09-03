@@ -17,3 +17,5 @@ web-build/
 
 android
 logs.txt
+*.aab
+*.apk
