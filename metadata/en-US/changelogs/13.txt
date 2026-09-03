@@ -1,0 +1,2 @@
+* Target Android 16 (API level 36)
+* Stability and performance improvements

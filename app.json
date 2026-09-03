@@ -2,7 +2,7 @@
 	"expo": {
 		"name": "Local Lock",
 		"slug": "locallock",
-		"version": "0.8.2",
+		"version": "0.8.3",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"splash": {
@@ -23,7 +23,7 @@
 				"backgroundColor": "#F8FAFC"
 			},
 			"package": "com.diginova.locallock",
-			"versionCode": 12,
+			"versionCode": 13,
 			"permissions": ["USE_BIOMETRIC"],
 			"blockedPermissions": [
 				"READ_EXTERNAL_STORAGE",
@@ -47,6 +47,9 @@
 				"expo-build-properties",
 				{
 					"android": {
+						"compileSdkVersion": 36,
+						"targetSdkVersion": 36,
+						"buildToolsVersion": "36.0.0",
 						"enableProguardInReleaseBuilds": true,
 						"allowBackup": false
 					}
