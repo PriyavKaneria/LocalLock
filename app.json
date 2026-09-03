@@ -68,7 +68,8 @@
 					},
 					"imageWidth": 200
 				}
-			]
+			],
+			"./plugins/withPluginManagementRepositories"
 		]
 	}
 }

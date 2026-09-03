@@ -11,19 +11,13 @@
 			"android": {
 				"buildType": "apk"
 			},
-			"distribution": "internal",
-			"env": {
-				"EAS_BUILD_DISABLE_MAVEN_CACHE": "1"
-			}
+			"distribution": "internal"
 		},
 		"production": {
 			"android": {
 				"buildType": "app-bundle"
 			},
-			"distribution": "store",
-			"env": {
-				"EAS_BUILD_DISABLE_MAVEN_CACHE": "1"
-			}
+			"distribution": "store"
 		}
 	},
 	"submit": {
