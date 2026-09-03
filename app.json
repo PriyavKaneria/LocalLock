@@ -2,7 +2,7 @@
 	"expo": {
 		"name": "Local Lock",
 		"slug": "locallock",
-		"version": "0.8.1",
+		"version": "0.8.2",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"splash": {
@@ -23,7 +23,7 @@
 				"backgroundColor": "#F8FAFC"
 			},
 			"package": "com.diginova.locallock",
-			"versionCode": 11,
+			"versionCode": 12,
 			"permissions": ["USE_BIOMETRIC"],
 			"blockedPermissions": [
 				"READ_EXTERNAL_STORAGE",
@@ -31,8 +31,7 @@
 				"INTERNET",
 				"SYSTEM_ALERT_WINDOW",
 				"VIBRATE"
-			],
-			"edgeToEdgeEnabled": false
+			]
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
@@ -54,7 +53,19 @@
 				}
 			],
 			"expo-font",
-			"expo-secure-store"
+			"expo-secure-store",
+			[
+				"expo-splash-screen",
+				{
+					"backgroundColor": "#f9fbfc",
+					"image": "./assets/icon.png",
+					"dark": {
+						"image": "./assets/icon.png",
+						"backgroundColor": "#1e1e1e"
+					},
+					"imageWidth": 200
+				}
+			]
 		]
 	}
 }

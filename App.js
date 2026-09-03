@@ -25,7 +25,7 @@ export default () => {
 							finish: "Ok",
 						}}
 						preventOutsideInteraction={true}>
-						<StatusBar translucent={false} />
+						<StatusBar />
 						<MainStack />
 					</TourGuideProvider>
 				</NavigationContainer>

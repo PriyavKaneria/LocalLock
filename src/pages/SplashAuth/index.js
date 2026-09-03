@@ -10,6 +10,7 @@ import {
 	Text,
 	Alert,
 	Dimensions,
+	KeyboardAvoidingView,
 } from "react-native"
 import * as SplashScreen from "expo-splash-screen"
 import { useFonts } from "expo-font"
@@ -23,6 +24,7 @@ import {
 } from "../../utils/secure_store"
 
 import { Animated, Image } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 import Onboarding from "react-native-onboarding-swiper"
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView)
 
@@ -241,6 +243,7 @@ export default () => {
 			backgroundColor: settings.darkMode ? "#252526" : "white",
 			width: "100%",
 			height: "100%",
+			paddingTop: 0,
 		},
 		animation: {
 			width: 400,
@@ -292,13 +295,15 @@ export default () => {
 	}
 
 	return (
-		<View style={styles.main} onLayout={onLayoutRootView}>
+		// <SafeAreaView edges={["bottom"]}>
+		<SafeAreaView style={styles.main} onLayout={onLayoutRootView}>
 			{!settings.onboardingCompleted && (
 				<Onboarding
 					containerStyles={{
 						flex: 1,
 						paddingVertical: 0,
 						marginVertical: 0,
+						justifyContent: "flex-start",
 					}}
 					flatlistProps={{
 						contentContainerStyle: {
@@ -318,7 +323,11 @@ export default () => {
 						width: "100%",
 						justifyContent: "flex-start",
 						paddingBottom: "unset",
+						paddingTop: 0,
 						alignItems: "flex-start",
+					}}
+					titleStyles={{
+						marginTop: 20,
 					}}
 					onDone={() => {
 						dispatch({
@@ -427,34 +436,37 @@ export default () => {
 						style={styles.animation}
 					/>
 					{/* Input with label to enter PIN */}
-					<View style={styles.inputContainer}>
-						<Text style={styles.inputLabel}>
-							{isPinSet ? "Enter PIN" : "Set PIN"}
-						</Text>
-						<SmoothPinCodeInput
-							cellStyle={{
-								borderBottomWidth: 2,
-								borderColor: "gray",
-							}}
-							cellStyleFocused={{
-								borderColor: settings.darkMode ? "white" : "black",
-							}}
-							textStyleFocused={{
-								color: settings.darkMode ? "white" : "black",
-							}}
-							value={pin}
-							password
-							onTextChange={(text) => handlePinInput(text)}
-						/>
-						{/* Button to authenticate with biometrics */}
-						<TouchableOpacity
-							onPress={() => authenticate()}
-							style={styles.biometricsButton}>
-							<Text style={styles.buttonText}>Use Biometrics</Text>
-						</TouchableOpacity>
-					</View>
+					<KeyboardAvoidingView behavior='position'>
+						<View style={styles.inputContainer}>
+							<Text style={styles.inputLabel}>
+								{isPinSet ? "Enter PIN" : "Set PIN"}
+							</Text>
+							<SmoothPinCodeInput
+								cellStyle={{
+									borderBottomWidth: 2,
+									borderColor: "gray",
+								}}
+								cellStyleFocused={{
+									borderColor: settings.darkMode ? "white" : "black",
+								}}
+								textStyleFocused={{
+									color: settings.darkMode ? "white" : "black",
+								}}
+								value={pin}
+								password
+								onTextChange={(text) => handlePinInput(text)}
+							/>
+							{/* Button to authenticate with biometrics */}
+							<TouchableOpacity
+								onPress={() => authenticate()}
+								style={styles.biometricsButton}>
+								<Text style={styles.buttonText}>Use Biometrics</Text>
+							</TouchableOpacity>
+						</View>
+					</KeyboardAvoidingView>
 				</>
 			)}
-		</View>
+			{/* </View> */}
+		</SafeAreaView>
 	)
 }

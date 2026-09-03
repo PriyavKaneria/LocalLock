@@ -13,6 +13,7 @@ import {
 	Button,
 	FlatList,
 	Platform,
+	KeyboardAvoidingView,
 } from "react-native"
 import { TouchableOpacity as FixedTouchableOpacity } from "react-native-gesture-handler"
 import { useNavigation } from "@react-navigation/native"
@@ -372,7 +373,15 @@ export default () => {
 	const modalStyles = StyleSheet.create({
 		nomargin: {
 			margin: 0,
-			color: settings.darkMode ? "white" : "black",
+			backgroundColor: settings.darkMode ? "#1e1e1e" : "#f5f5f5",
+			color: settings.darkMode ? "#dedede" : "#091e42",
+			borderRadius: 3,
+			paddingLeft: 8,
+			paddingRight: 8,
+			paddingTop: 6,
+			paddingBottom: 6,
+			height: 36,
+			marginRight: 5,
 		},
 		floatLeft: {
 			textAlign: "left",
@@ -578,7 +587,7 @@ export default () => {
 						style={{
 							flex: 1,
 							color: settings.darkMode ? "#dedede" : "#091e42",
-							padding: 8,
+							padding: 12,
 						}}
 						placeholder='Search by title...'
 						placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
@@ -646,236 +655,261 @@ export default () => {
 					setModalVisible(false)
 					setCategoryDropdownVisible(false)
 				}}>
-				<ScrollView
-					nestedScrollEnabled={true}
-					style={modalStyles.root}
-					contentContainerStyle={{
-						paddingBottom: 50,
-					}}>
-					<Text style={modalStyles.floatLeft}>
-						{addPasswordMode
-							? "Add id/title"
-							: editReferenceMode
-							? "Edit id/title"
-							: "Reference"}
-					</Text>
-					<View style={modalStyles.inputContainer} id='step2'>
-						<TextInput
-							style={{
-								...modalStyles.input,
-								width: addPasswordMode || editReferenceMode ? "100%" : "90%",
-							}}
-							editable={editReferenceMode}
-							onChangeText={(text) => setReference(text)}
-							value={reference}
-							placeholder='Enter id/title'
-							placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
-						/>
-						{!addPasswordMode && (
-							<TouchableOpacity onPress={toggleReferenceEditMode}>
-								{!editReferenceMode && (
-									<ModalButtonImage
-										source={require("../../../assets/app/edit.png")}
-										style={screenStyles.image}
-									/>
-								)}
-							</TouchableOpacity>
-						)}
-					</View>
-					<Text style={modalStyles.floatLeft}>
-						{addPasswordMode
-							? "Add Password"
-							: editPasswordMode
-							? "Edit password"
-							: settings.longPressToCopy
-							? "Password (tap & hold to see, long press to copy)"
-							: "Password (tap and hold to see)"}
-					</Text>
-					<View style={modalStyles.inputContainer} id='step3'>
-						<TouchableOpacity
-							onPressIn={() => setPasswordVisible(true)}
-							onPressOut={() => setPasswordVisible(false)}
-							onLongPress={() => {
-								if (!editPasswordMode && settings.longPressToCopy) {
-									// copy password to clipboard
-									Clipboard.setStringAsync(password).then(() => {
-										// show toast for below android 13
-										if (Platform.OS === "android" && Platform.Version < 33) {
-											ToastAndroid.show(
-												"Password copied to clipboard",
-												ToastAndroid.SHORT
-											)
-										}
-									})
-								}
-							}}
-							activeOpacity={1}
-							style={{
-								...modalStyles.input,
-								width: addPasswordMode || editPasswordMode ? "100%" : "90%",
-							}}>
-							<TextInput
-								style={modalStyles.nomargin}
-								editable={editPasswordMode}
-								onChangeText={(text) => setPassword(text)}
-								value={password}
-								placeholder='Enter password'
-								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
-								secureTextEntry={!editPasswordMode && !passwordVisible}
-							/>
-						</TouchableOpacity>
-						{!addPasswordMode && (
-							<TouchableOpacity onPress={togglePasswordEditMode}>
-								{!editPasswordMode && (
-									<ModalButtonImage
-										source={require("../../../assets/app/edit.png")}
-										style={screenStyles.image}
-									/>
-								)}
-							</TouchableOpacity>
-						)}
-					</View>
-					<Text style={modalStyles.floatLeft}>
-						{addPasswordMode
-							? "Add Notes"
-							: editNoteMode
-							? "Edit notes"
-							: "Notes"}
-					</Text>
-					<View style={modalStyles.inputContainer} id='step4'>
-						{editNoteMode && (
+				<KeyboardAvoidingView behavior='position'>
+					<ScrollView
+						nestedScrollEnabled={true}
+						style={modalStyles.root}
+						contentContainerStyle={{
+							paddingBottom: 50,
+						}}>
+						<Text style={modalStyles.floatLeft}>
+							{addPasswordMode
+								? "Add id/title"
+								: editReferenceMode
+								? "Edit id/title"
+								: "Reference"}
+						</Text>
+						<View style={modalStyles.inputContainer} id='step2'>
 							<TextInput
 								style={{
-									...modalStyles.textarea,
-									width: addPasswordMode || editNoteMode ? "100%" : "90%",
+									...modalStyles.input,
+									width: addPasswordMode || editReferenceMode ? "100%" : "90%",
 								}}
-								editable={editNoteMode}
-								onChangeText={(text) => setNote(text)}
-								value={note}
-								multiline={true}
-								placeholder='Enter notes...'
+								editable={editReferenceMode}
+								onChangeText={(text) => setReference(text)}
+								value={reference}
+								placeholder='Enter id/title'
 								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
 							/>
-						)}
-						{!editNoteMode && (
-							<View
-								style={{
-									flex: 1,
-									flexGrow: 1,
-									...modalStyles.textarea,
-								}}>
-								<ScrollView
-									contentContainerStyle={{
-										flexGrow: 1,
+							{!addPasswordMode && (
+								<TouchableOpacity onPress={toggleReferenceEditMode}>
+									{!editReferenceMode && (
+										<ModalButtonImage
+											source={require("../../../assets/app/edit.png")}
+											style={screenStyles.image}
+										/>
+									)}
+								</TouchableOpacity>
+							)}
+						</View>
+						<Text style={modalStyles.floatLeft}>
+							{addPasswordMode
+								? "Add Password"
+								: editPasswordMode
+								? "Edit password"
+								: settings.longPressToCopy
+								? "Password (tap & hold to see, long press to copy)"
+								: "Password (tap and hold to see)"}
+						</Text>
+						<View style={modalStyles.inputContainer} id='step3'>
+							{editPasswordMode ? (
+								<TextInput
+									style={{
+										...modalStyles.input,
+										width: addPasswordMode || editPasswordMode ? "100%" : "90%",
+									}}
+									editable={editPasswordMode}
+									onChangeText={(text) => setPassword(text)}
+									value={password}
+									placeholder='Enter password'
+									placeholderTextColor={
+										settings.darkMode ? "#828282" : "#a3a3a3"
+									}
+									secureTextEntry={!editPasswordMode && !passwordVisible}
+								/>
+							) : (
+								<TouchableOpacity
+									onPressIn={() => setPasswordVisible(true)}
+									onPressOut={() => setPasswordVisible(false)}
+									onLongPress={() => {
+										if (!editPasswordMode && settings.longPressToCopy) {
+											// copy password to clipboard
+											Clipboard.setStringAsync(password).then(() => {
+												// show toast for below android 13
+												if (
+													Platform.OS === "android" &&
+													Platform.Version < 33
+												) {
+													ToastAndroid.show(
+														"Password copied to clipboard",
+														ToastAndroid.SHORT
+													)
+												}
+											})
+										}
+									}}
+									activeOpacity={1}
+									style={{
+										width: "90%",
 									}}>
-									<Text
-										style={{
-											color: settings.darkMode ? "#dedede" : "#091e42",
-										}}>
-										{note}
-									</Text>
-								</ScrollView>
-							</View>
-						)}
-						{!addPasswordMode && (
-							<TouchableOpacity onPress={toggleNoteEditMode}>
-								{!editNoteMode && (
-									<ModalButtonImage
-										source={require("../../../assets/app/edit.png")}
-										style={screenStyles.image}
+									<TextInput
+										pointerEvents='none'
+										style={modalStyles.input}
+										value={password}
+										editable={false}
+										secureTextEntry={!editPasswordMode && !passwordVisible}
 									/>
-								)}
-							</TouchableOpacity>
-						)}
-					</View>
-					{/* Category Input */}
-					<Text style={modalStyles.floatLeft}>Category</Text>
-					<View
-						style={{ ...modalStyles.inputContainer, flexDirection: "column" }}>
-						<TextInput
-							style={{ ...modalStyles.input, width: "100%" }}
-							value={categoryInput}
-							onFocus={() => setCategoryDropdownVisible(true)}
-							onBlur={() =>
-								setTimeout(() => setCategoryDropdownVisible(false), 200)
-							}
-							onChangeText={handleCategoryInputChange}
-							placeholder='Select or type category'
-							placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
-						/>
-						{showNewCategoryHint && (
-							<Text
-								style={{
-									color: "#43A047",
-									fontSize: 12,
-									alignSelf: "flex-start",
-								}}>
-								New category will be created
-							</Text>
-						)}
-						{categoryDropdownVisible && categorySuggestions.length > 0 && (
-							<ScrollView
-								nestedScrollEnabled={true}
-								keyboardShouldPersistTaps='never'
-								style={{
-									position: "absolute",
-									bottom: 50,
-									left: 0,
-									right: 0,
-									backgroundColor: settings.darkMode ? "#222" : "#fff",
-									borderWidth: 1,
-									borderColor: settings.darkMode ? "#616161" : "#dfe1e6",
-									zIndex: 10,
-									borderRadius: 5,
-									height: Math.min(150, categorySuggestions.length * 40),
-								}}>
-								{categorySuggestions.map((cat) => (
-									<FixedTouchableOpacity
-										key={cat}
-										onPress={() => {
-											setCategoryInput(cat)
-											setCategoryDropdownVisible(false)
+								</TouchableOpacity>
+							)}
+
+							{!addPasswordMode && (
+								<TouchableOpacity onPress={togglePasswordEditMode}>
+									{!editPasswordMode && (
+										<ModalButtonImage
+											source={require("../../../assets/app/edit.png")}
+											style={screenStyles.image}
+										/>
+									)}
+								</TouchableOpacity>
+							)}
+						</View>
+						<Text style={modalStyles.floatLeft}>
+							{addPasswordMode
+								? "Add Notes"
+								: editNoteMode
+								? "Edit notes"
+								: "Notes"}
+						</Text>
+						<View style={modalStyles.inputContainer} id='step4'>
+							{editNoteMode && (
+								<TextInput
+									style={{
+										...modalStyles.textarea,
+										width: addPasswordMode || editNoteMode ? "100%" : "90%",
+									}}
+									editable={editNoteMode}
+									onChangeText={(text) => setNote(text)}
+									value={note}
+									multiline={true}
+									placeholder='Enter notes...'
+									placeholderTextColor={
+										settings.darkMode ? "#828282" : "#a3a3a3"
+									}
+								/>
+							)}
+							{!editNoteMode && (
+								<View
+									style={{
+										flex: 1,
+										flexGrow: 1,
+										...modalStyles.textarea,
+									}}>
+									<ScrollView
+										contentContainerStyle={{
+											flexGrow: 1,
 										}}>
 										<Text
 											style={{
-												padding: 10,
 												color: settings.darkMode ? "#dedede" : "#091e42",
 											}}>
-											{cat}
+											{note}
 										</Text>
-									</FixedTouchableOpacity>
-								))}
-							</ScrollView>
-						)}
-					</View>
-					<View style={modalStyles.buttonContainer}>
-						<TouchableOpacity
-							style={modalStyles.deleteButton}
-							onPress={handleDeleteButton}>
-							<Text style={modalStyles.buttonText}>
-								{editReferenceMode ||
-								editPasswordMode ||
-								editNoteMode ||
-								categoryInput !== oldCategoryInput
-									? "Cancel"
-									: "Delete"}
-							</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							id='step5'
-							style={modalStyles.okButton}
-							onPress={handleOkSave}>
-							<Text style={modalStyles.buttonText}>
-								{editReferenceMode ||
-								editPasswordMode ||
-								editNoteMode ||
-								categoryInput !== oldCategoryInput
-									? "Save"
-									: "Ok"}
-							</Text>
-						</TouchableOpacity>
-					</View>
-				</ScrollView>
+									</ScrollView>
+								</View>
+							)}
+							{!addPasswordMode && (
+								<TouchableOpacity onPress={toggleNoteEditMode}>
+									{!editNoteMode && (
+										<ModalButtonImage
+											source={require("../../../assets/app/edit.png")}
+											style={screenStyles.image}
+										/>
+									)}
+								</TouchableOpacity>
+							)}
+						</View>
+						{/* Category Input */}
+						<Text style={modalStyles.floatLeft}>Category</Text>
+						<View
+							style={{
+								...modalStyles.inputContainer,
+								flexDirection: "column",
+							}}>
+							<TextInput
+								style={{ ...modalStyles.input, width: "100%" }}
+								value={categoryInput}
+								onFocus={() => setCategoryDropdownVisible(true)}
+								onBlur={() =>
+									setTimeout(() => setCategoryDropdownVisible(false), 200)
+								}
+								onChangeText={handleCategoryInputChange}
+								placeholder='Select or type category'
+								placeholderTextColor={settings.darkMode ? "#828282" : "#a3a3a3"}
+							/>
+							{showNewCategoryHint && (
+								<Text
+									style={{
+										color: "#43A047",
+										fontSize: 12,
+										alignSelf: "flex-start",
+									}}>
+									New category will be created
+								</Text>
+							)}
+							{categoryDropdownVisible && categorySuggestions.length > 0 && (
+								<ScrollView
+									nestedScrollEnabled={true}
+									keyboardShouldPersistTaps='never'
+									style={{
+										position: "absolute",
+										bottom: 50,
+										left: 0,
+										right: 0,
+										backgroundColor: settings.darkMode ? "#222" : "#fff",
+										borderWidth: 1,
+										borderColor: settings.darkMode ? "#616161" : "#dfe1e6",
+										zIndex: 10,
+										borderRadius: 5,
+										height: Math.min(150, categorySuggestions.length * 40),
+									}}>
+									{categorySuggestions.map((cat) => (
+										<FixedTouchableOpacity
+											key={cat}
+											onPress={() => {
+												setCategoryInput(cat)
+												setCategoryDropdownVisible(false)
+											}}>
+											<Text
+												style={{
+													padding: 10,
+													color: settings.darkMode ? "#dedede" : "#091e42",
+												}}>
+												{cat}
+											</Text>
+										</FixedTouchableOpacity>
+									))}
+								</ScrollView>
+							)}
+						</View>
+						<View style={modalStyles.buttonContainer}>
+							<TouchableOpacity
+								style={modalStyles.deleteButton}
+								onPress={handleDeleteButton}>
+								<Text style={modalStyles.buttonText}>
+									{editReferenceMode ||
+									editPasswordMode ||
+									editNoteMode ||
+									categoryInput !== oldCategoryInput
+										? "Cancel"
+										: "Delete"}
+								</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								id='step5'
+								style={modalStyles.okButton}
+								onPress={handleOkSave}>
+								<Text style={modalStyles.buttonText}>
+									{editReferenceMode ||
+									editPasswordMode ||
+									editNoteMode ||
+									categoryInput !== oldCategoryInput
+										? "Save"
+										: "Ok"}
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</ScrollView>
+				</KeyboardAvoidingView>
 			</Modal>
 			<AddPasswordButton
 				onPress={handleAddPassword}
