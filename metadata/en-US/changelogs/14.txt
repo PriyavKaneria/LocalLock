@@ -1,0 +1,3 @@
+* Target Android 16 (API level 36)
+* Support 16 KB memory page sizes
+* Stability and performance improvements

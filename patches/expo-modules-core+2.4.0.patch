@@ -1,0 +1,32 @@
+diff --git a/node_modules/expo-modules-core/android/CMakeLists.txt b/node_modules/expo-modules-core/android/CMakeLists.txt
+index a8c634c..f9718a2 100644
+--- a/node_modules/expo-modules-core/android/CMakeLists.txt
++++ b/node_modules/expo-modules-core/android/CMakeLists.txt
+@@ -8,6 +8,7 @@ set(PACKAGE_NAME "expo-modules-core")
+ set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
+ 
+ string(APPEND CMAKE_CXX_FLAGS " -DREACT_NATIVE_TARGET_VERSION=${REACT_NATIVE_TARGET_VERSION}")
++string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,-z,max-page-size=16384")
+ 
+ if (${NATIVE_DEBUG})
+     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
+@@ -123,6 +124,7 @@ target_compile_options(
+ 
+ target_link_libraries(
+   ${PACKAGE_NAME}
++  "-Wl,-z,max-page-size=16384"
+   CommonSettings
+   ${LOG_LIB}
+   fbjni::fbjni
+diff --git a/node_modules/expo-modules-core/android/build.gradle b/node_modules/expo-modules-core/android/build.gradle
+index 99d8d69..f30be71 100644
+--- a/node_modules/expo-modules-core/android/build.gradle
++++ b/node_modules/expo-modules-core/android/build.gradle
+@@ -85,6 +85,7 @@ android {
+       cmake {
+         abiFilters(*reactNativeArchitectures())
+         arguments "-DANDROID_STL=c++_shared",
++          "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384",
+           "-DREACT_NATIVE_DIR=${expoModuleExtension.reactNativeDir}",
+           "-DREACT_NATIVE_TARGET_VERSION=${expoModuleExtension.reactNativeVersion.minor}",
+           "-DUSE_HERMES=${USE_HERMES}",
